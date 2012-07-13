@@ -165,3 +165,27 @@ E, [2012-07-13T18:12:09.195931 #5148] ERROR -- : Can Not Open [http://www.litong
 E, [2012-07-13T18:12:09.957974 #5148] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
 E, [2012-07-13T18:12:10.665015 #5148] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
 D, [2012-07-13T18:12:10.665015 #5148] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:03:08.551426 #3840] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:03:10.201520 #3840] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:03:11.338585 #3840] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:03:11.338585 #3840] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:05:11.205441 #2804] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:05:17.654810 #2804] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:05:18.783875 #2804] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:05:18.783875 #2804] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:06:29.667929 #256] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:06:31.056008 #256] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:06:32.581096 #256] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:06:32.581096 #256] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:09:09.250057 #1916] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:09:10.395122 #1916] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:09:11.823204 #1916] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:09:11.823204 #1916] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:09:50.064391 #3964] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:09:52.082506 #3964] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:09:53.188570 #3964] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:09:53.188570 #3964] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+E, [2012-07-13T19:12:41.705208 #3612] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:12:42.911277 #3612] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+E, [2012-07-13T19:12:44.044342 #3612] ERROR -- : Can Not Open [http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html]
+D, [2012-07-13T19:12:44.044342 #3612] DEBUG -- : processing http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html

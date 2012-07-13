@@ -105,8 +105,11 @@ module SanLv
 			  detail
 			end
 			pp details
-	if block_given?					
-			blk.call(details[:type])
+	if block_given?	
+			details.each do |d|
+				blk.call(d[:type] + "\t" + d[:style] + "\t" + d[:cars] + "\t" + d[:size])
+			end
+			
 		else
 			puts details
 		end
@@ -211,7 +214,7 @@ end #SanLv
 
 include SanLv
 
-id = 606036
+id = 1
 
 Runner.go id
  
