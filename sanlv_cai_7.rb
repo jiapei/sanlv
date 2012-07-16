@@ -10,10 +10,11 @@ module SanLv
         attr_reader :domain, :id, :article
         attr_reader :end_type
         def initialize id
-		#
+		#http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&showType=catalog&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=timedown&pageNum=
 		#http://www.litongly.cn/page/offerdetail.htm?offerId=508084921
-            @domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=tradenumdown&pageNum=]
-            @article = 'article'
+            #@domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=tradenumdown&pageNum=]
+            @domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&showType=window&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=timedown&pageNum=]
+			@article = 'article'
             @end_type = '.html'
             @id = id.to_s
         end     
@@ -114,8 +115,15 @@ module SanLv
 				end
 				pp details
 			if block_given?	
-				#details.collect { |p| p.id }.join('\t')
-				blk.call(details.join "\t")
+				temp = ""
+				details.collect  do |p| 
+					s = p
+					p.encode!("utf-8" , "gbk")
+					if(["类别" , "型号" , "适用车型" , "外型尺寸"].include? p.split(/：/)[0])
+						temp << "#{s}\t"
+					end
+				end
+				blk.call(temp)
 			else
 				puts details
 			end
