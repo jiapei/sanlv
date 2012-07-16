@@ -5,21 +5,12 @@ require 'open-uri'
 require 'logger'
 require 'pp'
 
-class String
-    def br_to_new_line
-        self.gsub('<br>', "\n")
-    end
-    def strip_tag
-        self.gsub(%r[<[^>]*>], '')
-    end
-end #String
-
 module SanLv
     class UrlBuilder
         attr_reader :domain, :id, :article
         attr_reader :end_type
         def initialize id
-		#http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
+		#
 		#http://www.litongly.cn/page/offerdetail.htm?offerId=508084921
             @domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=tradenumdown&pageNum=]
             @article = 'article'
@@ -115,29 +106,16 @@ module SanLv
 		
         def build_content &blk
 		
-			rows = @doc.xpath('//div[@id="mod-detail-attributes"]/table/tbody')
+			rows = @doc.xpath('//div[@id="mod-detail-attributes"]/table/tbody/tr/td')
 				details = rows.collect do |row|
 					puts row
-					puts "=="
-				  detail = {}
-				  [
-					[:type, 'tr[1]/td[1]/text()'],
-					[:style, 'tr[1]/td[2]/text()'],
-					[:cars, 'tr[1]/td[3]/text()'],
-					[:size, 'tr[2]/td[1]/text()'],
-				  ].each do |name, xpath|
-					
-					detail[name] = row.at_xpath(xpath).to_s.strip #split(/[：]/)[1].strip
-					puts "***details[name]" + detail[name]
-				  end
-				  detail
+					puts "="*40
+				  detail = row.at_xpath('text()').to_s.strip
 				end
 				pp details
 			if block_given?	
-				details.each do |d|
-					blk.call(d[:type] + "\t" + d[:style] + "\t" + d[:cars] + "\t" + d[:size])
-				end
-				
+				#details.collect { |p| p.id }.join('\t')
+				blk.call(details.join "\t")
 			else
 				puts details
 			end
