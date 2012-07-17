@@ -13,7 +13,9 @@ module SanLv
 		#http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&showType=catalog&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=timedown&pageNum=
 		#http://www.litongly.cn/page/offerdetail.htm?offerId=508084921
             #@domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=tradenumdown&pageNum=]
-            @domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900184&catPid=&showType=window&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=timedown&pageNum=]
+            #2900184 (空气滤清器） 2900341（空调滤清器） 2900344（汽油、燃油滤清器） 2900345（机油滤清器 ）
+			 catId = 2900341
+			@domain = %q[http://www.litongly.cn/page/offerlist.htm?catId=2900344&catPid=&showType=window&tradenumFilter=false&priceFilter=false&mixFilter=false&privateFilter=false&groupFilter=false&sortType=timedown&pageNum=]
 			@article = 'article'
             @end_type = '.html'
             @id = id.to_s
@@ -195,6 +197,7 @@ module SanLv
 
             def get_total_page
                 @total_page = ContentWorker.new(@start_url).total_page
+				@total_page = 1 if @total_page == 0
 				puts @total_page.to_s + "pages"
                 if @total_page.nil?
                     puts 'Can not get total page'
