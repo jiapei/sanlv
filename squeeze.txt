@@ -1,0 +1,102 @@
+﻿example = '<table width="600" border="0" align="center" cellpadding="0" cellspacing="0" class="product_bk1">
+
+		<tr>
+
+			<td>
+
+				<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+
+					<tr>
+
+						<td width="30%" align="right" class="product_bk5"><span class="product_text">产品类别：</span></td>
+
+						<td class="product_bk5">
+
+						PP空气滤清器
+
+						</td>
+
+					</tr>
+
+					<tr>
+
+						<td width="30%" align="right" class="product_bk5"><span class="product_text">产品编号：</span></td>
+
+						<td class="product_bk5">SA-31090</td>
+
+					</tr>
+
+					<tr>
+
+						<td width="30%" align="right" class="product_bk5"><span class="product_text">原厂编号：</span></td>
+
+						<td class="product_bk5">17801-31090</td>
+
+					</tr>
+
+					<tr>
+
+						<td width="30%" align="right" class="product_bk5"><span class="product_text">产品规格：</span></td>
+
+						<td class="product_bk5"></td>
+
+					</tr>
+
+					<tr>
+
+						<td width="30%" align="right" class="product_bk5"><span class="product_text">适用车型：</span></td>
+
+						<td class="product_bk5">
+
+						丰田 
+
+						</td>
+
+					</tr>
+
+				</table>
+
+			</td>
+
+		</tr>
+
+		<tr>
+
+			<td colspan="2"><P>
+
+<P>
+
+<P>
+
+<P>
+
+<P>
+
+<P>
+
+<P>
+
+<P>&nbsp;&nbsp;霸道4000</P>
+
+<P></P>
+
+<P></P>
+
+<P></P>
+
+<P></P>
+
+<P></P>
+
+<P></P>
+
+<P></P></td>
+
+		</tr>
+
+	</table>
+'
+						
+puts example.strip.squeeze("\t").gsub(/\n/,"")	
+puts example.strip.gsub(%r[<[^>]*>], '').gsub(/\t/, '').gsub(/\n/, '')
+		
