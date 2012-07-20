@@ -1,39 +1,42 @@
+﻿#encoding: utf-8
 require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
 require 'logger'
+require 'pp'
 
 class String
     def br_to_new_line
         self.gsub('<br>', "\n")
     end
+    def n_to_nil
+        self.gsub('\n', "")
+    end	
     def strip_tag
-        self.gsub(%r[<[^>]*>], '')
+        self.gsub(%r[<[^>]*>], '').gsub(/\t|\n|\r/, ' ')
     end
 end #String
-
 module SanLv
     class UrlBuilder
-        attr_reader :domain, :id, :article
+        attr_reader :domain, :id
         attr_reader :end_type
         def initialize id
-		#http://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html
-		#http://www.litongly.cn/page/offerdetail.htm?offerId=508084921
-            @domain = %q[http://tianyayidu.com/]
-            @article = 'article'
-            @end_type = '.html'
+			@domain = %q[http://www.szxdc.net/Products]
+            @end_type = '_qc.html'
             @id = id.to_s
-        end     
-        def article_url
-            "ttp://www.litongly.cn/athena/offerdetail/sale/litongly-1032152-558158414.html"
-			#@domain + @article + '-a-'+ id + @end_type
-        end #article_url        
-        def build_article_url page
+        end
+		
+		def first_page_url
+            @domain + @end_type
+        end #first_page_url
+        
+        def build_page_url page
             page = page.to_s
-            "#{@domain}#{@article}-a-#{@id}-#{page+@end_type}"
-        end #build_article_url      
+            "#{@domain}#{page}#{@end_type}"
+        end #build_page_url      
     end #UrlBuilder
-    class ContentWorker
+    
+	class ContentWorker
         attr_reader :url, :doc, :retry_time
         attr_accessor :page_css, :content_css
         class << self
@@ -44,6 +47,7 @@ module SanLv
                 @@log
             end
         end #class
+		
         def initialize url
             @url = url
             define_max_retry_time
@@ -53,6 +57,7 @@ module SanLv
             exit if @doc.nil?
             log_or_output_info
         end #initialize     
+		
         def log_or_output_info
             msg = "processing #{@url}"
             if @@log
@@ -60,20 +65,18 @@ module SanLv
             else
                 puts msg
             end #if
-        end #log_or_output_info 
+        end #log_or_output_info
         def get_nokogiri_doc
             times = 0
-            from_encode ="gb18030"
+			from_encode ="gbk"
 			to_encode = "utf-8"
 
             begin
 				html_stream = open(@url).read.strip
-				#html_stream.encode!(to_encode, from_encode)
+				html_stream.encode!(to_encode, from_encode)
                 @doc = Nokogiri::HTML(html_stream)
-				
-            rescue StandardError,Timeout::Error, SystemCallError, Errno::ECONNREFUSED #��Щ�쳣���Ǳ�׼�쳣
-				puts $!  
-                @@log.error "Can Not Open [#{@url}] error: #{$!}" if @@log
+            rescue
+                @@log.error "Can Not Open [#{@url}]" if @@log
                 times += 1
                 retry if(times < @retry_time)
             end #begin
@@ -81,37 +84,65 @@ module SanLv
         def define_max_retry_time
             @retry_time = 3
         end #define_max_retry_time
+		
         def define_page_css
-            @page_css = %q[div.pageNum2]
+            @page_css = %q[div.page]
         end
         def define_content_css
-            #@content_css = %q[div.listbox span.txtty01]
-			@content_css = %q[body > table]
+            @content_css = %q[li.at.c.h2]
         end #define_content_css
-
+		
         def total_page
-            page = ''
-            doc.css(page_css).each do |p|
-                m = p.content.match(/\d+/)              
-                page = m[0] if m                                
-            end #each
-            page.to_i
+            #page = ''
+            #doc.css(page_css).each do |p|
+            #    m = p.content.match(/，\d+/)[0].match(/\d+/)  
+            #    page = m[0] if m                                
+            #end #each
+            #page.to_i
+			38
         end #total_page
+		
+		def build_lists &blk
+			puts "采集列表页"
+			lists = []
 
-        def build_content &blk
-			puts "get content"
-			puts @doc.at_css("title").text
+			@doc.css("table.STYLE1 > tr > td > a").each do |item|
+				lists << ["pic", "http://www.rizuan.com/" + item.attr("href")]
+			end
+
 			
-            @doc.css(@content_css).each do |li|
-				puts li
+			if block_given?	
+				blk.call(lists)			
+			else
+				puts lists.length
+			end
+			
+			
+		end
+		
+        def build_content &blk
+			puts "采集明细页"
+			puts @doc.at_css("title")
+			rows = @doc.xpath('//td[@width = "64%"]')
+puts rows.length
+			rows.collect do |row|
+				#puts row
+				puts "="*40
+				
+				item = row.to_s.strip_tag.strip 
+				puts "item:- #{item}"
 
-                if block_given?
-                    blk.call(li.text)
-                else
-                    puts li.to_html.br_to_new_line.strip_tag
-                end #if
-            end #each 
-        end #build_content
+				
+			if block_given?	
+				blk.call(item)
+			else
+				puts item
+			end
+			end
+			
+
+
+		end #build_content
     end #ContentWorker
 
     class IoFactory
@@ -146,9 +177,12 @@ module SanLv
 
                 init_logger
 
-                @url_builder = "http://www.rizuan.com/productshow_cn.asp?id=102"
-
-                create_file_to_write id             
+                @url_lists = ["http://www.szxdc.net/Products1_qc.html", "http://www.szxdc.net/Products_qc.html", "http://www.szxdc.net/Products_qc_1.html", "http://www.szxdc.net/Products2_qc.html", 
+				"http://www.szxdc.net/Products2_qc_1.html", "http://www.szxdc.net/Products3_qc.html", "http://www.szxdc.net/Products3_qc_1.html", "http://www.szxdc.net/Products4_qc.html",
+				"http://www.szxdc.net/Products4_qc_1.html", "http://www.szxdc.net/Products4_qc_2.html", "http://www.szxdc.net/Products5_qc.html", "http://www.szxdc.net/Products6_qc.html",
+				"http://www.szxdc.net/Products7_qc.html", "http://www.szxdc.net/Products8_qc.html"]             
+                
+				create_file_to_write id             
 
                 output_content
 
@@ -169,27 +203,20 @@ module SanLv
                 ContentWorker.log = logger
             end #init_logger
 
-            def get_start_url               
-                @start_url = @url_builder.article_url
-            end #get_start_url
-
-            def get_total_page
-                @total_page = ContentWorker.new(@start_url).total_page
-                if @total_page.nil?
-                    puts 'Can not get total page'
-                    exit
-                end #ifx
-
-            end # get_total_page
 
             def output_content              
-				puts "begin to cai"
-
-                    ContentWorker.new(@url_builder).build_content do |c|
-                        @file_to_write.puts c
-                        @file_to_write.puts '*' * 40
-					end #end ContentWorker
+				@url_lists.each do |url|
+                    list_url = url
+					puts "content_page: #{list_url}" 
+                    ContentWorker.new(list_url).build_content do |cc|
+								@file_to_write.puts cc
+								#@file_to_write.puts '*' * 40
+							end # build_content					
 						
+                end #for each
+
+
+  
 
             end #output_content
 
@@ -199,7 +226,7 @@ end #SanLv
 
 include SanLv
 
-id = 1234
+id = 1
 
 Runner.go id
  
