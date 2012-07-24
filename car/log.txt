@@ -1,0 +1,23 @@
+Can Not Open [http://data.auto.sina.com.cn/car/3000]
+Can Not Open [http://data.auto.sina.com.cn/car/3000]
+Can Not Open [http://data.auto.sina.com.cn/car/3000]
+processing http://data.auto.sina.com.cn/car/3000
+processing http://data.auto.sina.com.cn/car/3001
+processing http://data.auto.sina.com.cn/car/1014
+processing http://data.auto.sina.com.cn/car/1015
+processing http://data.auto.sina.com.cn/car/1016
+processing http://data.auto.sina.com.cn/car/1017
+processing http://data.auto.sina.com.cn/car/1018
+processing http://data.auto.sina.com.cn/car/1019
+processing http://data.auto.sina.com.cn/car/1020
+processing http://data.auto.sina.com.cn/car/1021
+processing http://data.auto.sina.com.cn/car/1022
+processing http://data.auto.sina.com.cn/car/1023
+processing http://data.auto.sina.com.cn/car/1024
+processing http://data.auto.sina.com.cn/car/1025
+processing http://data.auto.sina.com.cn/car/1026
+processing http://data.auto.sina.com.cn/car/1027
+processing http://data.auto.sina.com.cn/car/1028
+processing http://data.auto.sina.com.cn/car/1029
+processing http://data.auto.sina.com.cn/car/1030
+processing http://data.auto.sina.com.cn/car/1031
