@@ -71,9 +71,10 @@ module ItemParse
 		#变量定义=====End
 		
 		def get_htmlstream(id)
-			@car = Car.where(item_id: "sina_car_#{id}").first #.update(label: "doing")
+			@car = Car.includes(:cache_html).where(name: id).first #.update(label: "doing")
 			p @car.url
-			@html_stream = @car.html_content
+			@html_stream = @car.cache_html.value
+			puts @html_stream.length
 		end
 		
 		def get_nokogiri_doc
@@ -82,12 +83,43 @@ module ItemParse
 
 		def get_struct_data &blk
 			puts "get the struct data......"
-			@car.update_attributes({price: 14 , factory: "捷豹"})
+			@car.title = @doc.at_css("h1").text
+			@car.price = @doc.at_css("div.price b").text
 			
+			rows = @doc.css("div.conshow p")
+			@details = rows.collect do |row|
+				puts row
+				para = Parameter.new()
+				[
+					[:name, 0],
+					[:value, 1],
+				].each do |k, cc|
+					para[k] = row.inner_html.strip_51job_tag.split(/[：]/)[cc]
+				end
+				para
+			end
+
+			rows2 = @doc.css("tr.data")
+			@details2 = rows2.collect do |row|
+				puts row
+				para = Parameter.new()
+				[
+					[:name, "th"],
+					[:value, "td"],
+				].each do |k, cc|
+					para[k] = row.at_css(cc).text.strip
+				end
+				para
+			end
+			
+			
+			
+			@car.parameters = (@details + @details2)
+			@car.save			
 			if block_given?	
 				blk.call()			
 			else
-				puts @car.price
+				puts @car.name
 			end
 			
 			
@@ -141,7 +173,7 @@ module ItemParse
 	
 end
 include ItemParse
-id = 1020
+id = 1016
 to_id = 10230
 Runner.go(id)
 

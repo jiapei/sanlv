@@ -1,6 +1,7 @@
 development:
   sessions:
     default:
+      identity_map_enabled: true
       database: mycar_development
       hosts:
         - test.lehazi.com:27017

@@ -167,11 +167,18 @@ module Item
 			end
 			
 			def save_html_db(from_id)
-				from_id.upto(1030) do |i|
+				from_id.upto(1016) do |i|
 					get_item_url(i)
 					ContentWorker.new(@item_url, "gbk").get_html_item do |c|
 						car = Car.find_or_create_by(url: c[0])
-						car.update_attributes({item_id: "sina_car_#{i}", html_content: c[1]})
+						car.cache_html = CacheHtml.find_or_create_by(url: c[0])
+						car.cache_html.name = i
+						car.cache_html.url = car.url
+						car.cache_html.value = c[1]
+						
+						car.name = i
+						car.save
+
 					end
 				end
 				
