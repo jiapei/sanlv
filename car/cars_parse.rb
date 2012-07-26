@@ -53,8 +53,10 @@ module ItemParse
             define_mulit_css
 			
 			get_htmlstream(id)
-            get_nokogiri_doc
-            exit if @doc.nil?
+			if !@car.nil?
+				get_nokogiri_doc
+				exit if @doc.nil?
+			end
             log_or_output_info
         end #initialize 
 		
@@ -62,16 +64,17 @@ module ItemParse
 		#变量定义
         def define_single_css
 			@single_css ={}
-            @single_css ={车型: %q[h1], 市场均价: %q[div.price b] } #
+            #@single_css ={车型: %q[h1], 市场均价: %q[div.price b] } #
         end #define_single_css
 		
         def define_mulit_css
-            @mulit_css = {相关车型: %q[div.relation_tx ul li],  基本参数: "div.conshow p" }
+            #@mulit_css = {相关车型: %q[div.relation_tx ul li],  基本参数: "div.conshow p" }
         end #define_mulit_css
 		#变量定义=====End
 		
 		def get_htmlstream(id)
 			@car = Car.includes(:cache_html).where(name: id).first #.update(label: "doing")
+			return if @car.blank?
 			p @car.url
 			@html_stream = @car.cache_html.value
 			puts @html_stream.length
@@ -83,25 +86,27 @@ module ItemParse
 
 		def get_struct_data &blk
 			puts "get the struct data......"
+			return if @car.blank?
 			@car.title = @doc.at_css("h1").text
 			@car.price = @doc.at_css("div.price b").text
 			
 			rows = @doc.css("div.conshow p")
 			@details = rows.collect do |row|
-				puts row
+				#puts row
 				para = Parameter.new()
 				[
 					[:name, 0],
 					[:value, 1],
 				].each do |k, cc|
 					para[k] = row.inner_html.strip_51job_tag.split(/[：]/)[cc]
+					puts "#{k}:#{para[k]}"
 				end
 				para
 			end
 
 			rows2 = @doc.css("tr.data")
 			@details2 = rows2.collect do |row|
-				puts row
+				#puts row
 				para = Parameter.new()
 				[
 					[:name, "th"],
@@ -166,7 +171,10 @@ module ItemParse
 			end
 			
 			def save_html_db(id)
-				ContentWorker.new(id).get_struct_data 
+				1014.upto(1100) do |i|
+					ContentWorker.new(i.to_s).get_struct_data 
+				end
+				
 			end
 			
 	end

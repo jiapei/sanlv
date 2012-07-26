@@ -116,6 +116,7 @@ module Item
 
 		def get_html_item &blk
 			puts @url
+			puts @html_stream.length
 			
 			if block_given?	
 				blk.call([@url, @html_stream])			
@@ -167,21 +168,21 @@ module Item
 			end
 			
 			def save_html_db(from_id)
-				from_id.upto(1016) do |i|
+				from_id.upto(1020) do |i|
 					get_item_url(i)
 					ContentWorker.new(@item_url, "gbk").get_html_item do |c|
 						car = Car.find_or_create_by(url: c[0])
-						car.cache_html = CacheHtml.find_or_create_by(url: c[0])
-						car.cache_html.name = i
-						car.cache_html.url = car.url
-						car.cache_html.value = c[1]
+						cache_html = CacheHtml.find_or_create_by(url: c[0])
+						cache_html.name = i.to_s
+						cache_html.url = car.url
+						cache_html.value = c[1]
+						car.cache_html = cache_html
+						puts c[1].length
 						
 						car.name = i
 						car.save
-
 					end
 				end
-				
 			end
 			
 	end
@@ -191,6 +192,5 @@ include Item
 id = 1014
 to_id = 10230
 Runner.go(id)
-
 
 puts Car.all.size
