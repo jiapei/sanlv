@@ -111,3 +111,39 @@ processing http://data.auto.sina.com.cn/car/1017
 processing http://data.auto.sina.com.cn/car/1018
 processing http://data.auto.sina.com.cn/car/1019
 processing http://data.auto.sina.com.cn/car/1020
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+processing http://data.auto.sina.com.cn/car/2338
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+processing http://data.auto.sina.com.cn/car/2338
+processing http://data.auto.sina.com.cn/car/2338
+processing http://data.auto.sina.com.cn/car/2339
+processing http://data.auto.sina.com.cn/car/2339
+processing http://data.auto.sina.com.cn/car/2340
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+processing http://data.auto.sina.com.cn/car/2338
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+Can Not Open [http://data.auto.sina.com.cn/car/2338]
+processing http://data.auto.sina.com.cn/car/2338
+processing http://data.auto.qq.com/car_models/5407
+processing http://data.auto.qq.com/car_models/5408
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5408/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5408/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5408/index.shtml
+processing http://data.auto.qq.com/car_models/5407/index.shtml
+processing http://data.auto.qq.com/car_models/5408/index.shtml

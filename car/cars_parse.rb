@@ -77,6 +77,7 @@ module ItemParse
 			return if @car.blank?
 			p @car.url
 			@html_stream = @car.cache_html.value
+
 			puts @html_stream.length
 		end
 		
@@ -171,7 +172,7 @@ module ItemParse
 			end
 			
 			def save_html_db(id)
-				1014.upto(1100) do |i|
+				2338.upto(2339) do |i|
 					ContentWorker.new(i.to_s).get_struct_data 
 				end
 				
@@ -181,7 +182,7 @@ module ItemParse
 	
 end
 include ItemParse
-id = 1016
+id = 2339
 to_id = 10230
 Runner.go(id)
 

@@ -5,12 +5,6 @@ require 'nokogiri'
 require 'open-uri'
 require 'logger'
 
-=begin
- puts File.dirname(__FILE__)
- puts Dir.glob("#{File.dirname(__FILE__)}/*.rb")
- puts Dir.glob("#{File.dirname(__FILE__)}/test_mongoid.rb")
-=end
-
 Dir.glob("#{File.dirname(__FILE__)}/app/models/*.rb") do |lib|
   require lib
 end
@@ -20,32 +14,20 @@ ENV['MONGOID_ENV'] = 'development'
 
 Mongoid.load!("config/mongoid.yml")
 
-# item = HtmlContent.new
-# t = {:url => 'url', :content => 'content', :type => 'type', :status => 'status'}
-# item.update_attributes(t)
-
-#http://data.auto.sina.com.cn/car/1014
-#http://data.auto.sina.com.cn/car/10230
-
-
 module Item
 	class ItemUrl
 	    attr_reader :domain, :id, :before_str
         attr_reader :end_string
 		
-        def initialize id
-			begin_page = 1014
-			end_page = 10230
-			
-			@domain = %q[http://data.auto.sina.com.cn/car/]
-			@before_str = ''
-            @end_str = ''
+        def initialize(id)
+			@domain = $domain 
+			@before_str = $before_str
+            @end_str = $end_str 
             @id = id.to_s
-			
         end
 		
 		def item_url
-			"#{@domain}#{@before_str}#{@id}#{@end_type}"
+			"#{@domain}#{@before_str}#{@id}#{@end_str}"
 		end
 
 	end #end ItemUrl
@@ -156,8 +138,7 @@ module Item
             def self.go(id)
                 self.new(id)
             end	
-			
-			
+
 			def init_logger
                 logger_file = IoFactory.init('./log.txt')
                 logger = Logger.new logger_file
@@ -169,11 +150,11 @@ module Item
 			end
 			
 			def save_html_db(from_id)
-				from_id.upto(2339) do |i|
+				from_id.upto($end_page) do |i|
 					get_item_url(i)
-					ContentWorker.new(@item_url, "GB2312").get_html_item do |c|
-						car = Car.find_or_create_by(url: c[0])
-						cache_html = CacheHtml.find_or_create_by(url: c[0])
+					ContentWorker.new(@item_url, "GBK").get_html_item do |c|
+						car = $ItemClass.find_or_create_by(url: c[0])
+						cache_html = $ItemCache.find_or_create_by(url: c[0])
 						cache_html.name = i.to_s
 						cache_html.url = car.url
 						cache_html.value = c[1]
@@ -189,9 +170,20 @@ module Item
 	end
 	
 end
+begin_time = Time.now
+$domain = %q[http://data.auto.qq.com/car_models/]
+$before_str = ""
+$end_str = '/index.shtml'
+$begin_page =  5407 #5406 
+$end_page = 5408 #15057
+$ItemClass = Qqcar
+$ItemCache = QqCacheHtml
+#$ItemQqCache = qq_cache_html
+
 include Item
-id = 2338
-to_id = 10230
+id = 5407
 Runner.go(id)
 
 puts Car.all.size
+puts begin_time
+puts Time.now
