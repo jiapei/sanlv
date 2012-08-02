@@ -1,0 +1,5 @@
+http://www.niparts.com/Web/Include/GetCarType.aspx?sid=213&type=1
+
+http://www.niparts.com/Control/Index/readtype.ashx?mfaid=5439488&type=0&carType=1&Couid=213
+
+http://www.niparts.com/Control/Index/readtype.ashx?mfaid=4017664&type=1&Couid=213&code=E61A501D5A9078F7
