@@ -100,10 +100,10 @@ module SanLv
 		
 		def build_lists &blk
 			lists = []
-			lists << @doc.at_css("div.bt_navigatev1New").text.strip_tag.strip
+			title =  @doc.at_css("div.bt_navigatev1New").text.strip_tag.strip
 
 			@doc.xpath('//table[@id = "compare"]/tr/td[1]/a').each do |item|
-				lists << "\t\t#{item.to_s.strip_tag}\t#{item.at_xpath('@href')}"
+				lists << "#{title}\t#{item.to_s.strip_tag}\t#{item.at_xpath('@href')}"
 				#puts item.to_s.strip_tag
 
 			end
