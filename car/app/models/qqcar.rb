@@ -10,7 +10,7 @@ class Qqcar
   field :price2, type: String
   field :brand, type: String
   field :series, type: String
-  field :production, type: String
+  field :maker, type: String
 
   
   has_one :cache_html, class_name: "QqCacheHtml"
