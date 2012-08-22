@@ -5,9 +5,11 @@ class Task
   field :name, type: String
   field :url, type: String
   field :note, type: String
-  field :code, type: String
   field :published, type: Boolean
   
+  field :code, type: String
+  
+  has_many :task_dataes
 end
 
 
