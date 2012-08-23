@@ -1,0 +1,1 @@
+"\xCA" followed by "<" on GBK
