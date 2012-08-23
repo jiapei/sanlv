@@ -58,9 +58,10 @@ serials.each_with_index do |s, i|
 	#pp  s
 	puts i.to_s + "\t" + s[:url]
 	#error 219      http://data.auto.qq.com/car_serial/742/index.shtml
-	if i < 460
-		next
-	end
+	#error 460      
+	#if i < 460
+	#	next
+	#end
 
 	
 	@url = s[:url]

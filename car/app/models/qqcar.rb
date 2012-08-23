@@ -6,7 +6,7 @@ class Qqcar
   field :name_pinyin, type: String
 
   field :brand, type: String
-  field :series, type: String
+  field :series, type: Stringr
   field :maker, type: String
   
   field :url, type: String
