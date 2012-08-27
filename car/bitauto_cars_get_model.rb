@@ -12,8 +12,8 @@ Dir.glob("#{File.dirname(__FILE__)}/app/models/*.rb") do |lib|
 end
 
 
-ENV['MONGOID_ENV'] = 'localcar'
-#ENV['MONGOID_ENV'] = 'development'
+#ENV['MONGOID_ENV'] = 'localcar'
+ENV['MONGOID_ENV'] = 'development'
 
 Mongoid.load!("config/mongoid.yml")
 
@@ -38,7 +38,7 @@ create_file_to_write
 i = 0
 serials = []
 
-Brand.where({tip: "qqcar"}).each do |b|
+Brand.where({tip: "bitautocar"}).each do |b|
 	b.makers.each do |m|
 		m.serials.each do |s|
 			item = {}
@@ -46,24 +46,17 @@ Brand.where({tip: "qqcar"}).each do |b|
 			href  = s["href"]
 			item = { i: i, brand: b.name, brand_pinyin: b.name_pinyin, maker: m.name, series: s["name"], url: href}
 			serials << item
-			
 		end
 	end
 end
 
 puts serials.length
 
-serials.each_with_index do |s, i|
-	#get the url
-	#pp  s
-	puts i.to_s + "\t" + s[:url]
-	#error 219      http://data.auto.qq.com/car_serial/742/index.shtml
-	#error 460      
-	#if i < 460
-	#	next
-	#end
 
-	
+serials.each_with_index do |s, i|
+
+	puts i.to_s + "\t" + s[:url]
+
 	@url = s[:url]
 	headers = {"User-Agent" => "google",
 		"From" => "google",
@@ -71,19 +64,45 @@ serials.each_with_index do |s, i|
 
 	#html_stream = open(@url, headers).read.strip
 	html_stream = open(@url).read.strip
-	begin
-		html_stream.encode!('utf-8', 'gbk')
-	rescue Encoding::InvalidByteSequenceError
-		@file_to_write.puts "error from url : #{@url}"
-		@file_to_write.puts $!
-		p $!      #=> #<Encoding::InvalidByteSequenceError: "\xA1" followed by "\xFF" on EUC-JP>
-		puts $!.error_bytes.dump          #=> "\xA1"
-		puts $!.readagain_bytes.dump      #=> "\xFF"
-		next
-
-	end
 	
 	@doc = Nokogiri::HTML(html_stream)
+
+	lists = @doc.xpath('//em[@class = "h3_spcar"]//a/@href')
+	lists.each do |a|
+		url =  "http://car.bitauto.com#{a}"
+		puts url
+		@list_doc = Nokogiri::HTML(open(url).read.strip) 
+
+		year =  @list_doc.at_css("div#car_list > h3 > span").text.to(3)
+
+		@list_doc.xpath('//table[@id = "compare"]/tr/td[1]/a').each do |item|
+		
+			#puts item.to_s.strip_tag
+			#here get name, url, year
+			name = item.to_s.strip_tag
+			url = item.at_xpath('@href').to_s
+
+			puts  "name : #{item.to_s.strip_tag}"
+			puts  "href : #{item.at_xpath('@href')}"
+			puts  "year : #{year}"
+
+			@qqcar = Qqcar.find_or_create_by(url: url)
+			@qqcar.name = name
+			@qqcar.name_pinyin = Pinyin.t(name, '').downcase.to_s
+			@qqcar.brand = s[:brand]
+			@qqcar.series = s[:series]
+			@qqcar.maker = s[:maker]
+			#@qqcar.url = url
+			pp @qqcar
+			#@qqcar.save()			
+
+		end
+
+	end
+  
+	break
+	return
+	
 	rows = @doc.xpath('//table[@class = "data4"]/tr')
 
 	rows.each do |row|

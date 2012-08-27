@@ -5,6 +5,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'logger'
 require 'pp'
+require 'chinese_pinyin'
 
 Dir.glob("#{File.dirname(__FILE__)}/app/models/*.rb") do |lib|
   require lib
@@ -35,40 +36,46 @@ end #create_file_to_write
 
 create_file_to_write
 
-@url = "http://data.auto.qq.com/car_brand/index.shtml"
+@url = "http://car.bitauto.com/brandlist.html"
 headers = {"User-Agent" => "google",
     "From" => "google",
     "Referer" => "http://www.google.com/"}
 
 
 html_stream = open(@url, headers).read.strip
-html_stream.encode!('utf-8', 'gbk')
+#html_stream.encode!('utf-8', 'gbk')
 
 
 @doc = Nokogiri::HTML(html_stream)
 puts @doc.at_css("title").text()
 
 #rows =  @doc.xpath('//div[@class = "pic"]/a/img/@src')
-rows =  @doc.xpath('//ul[@class = "cl"]/li')
+brand_rows =  @doc.xpath('//dd[@class = "b"]/div[@class = "brandname"]')
+maker_rows =  @doc.xpath('//dd[@class = "have"]')
 
-puts rows.length
+puts brand_rows.length
+puts maker_rows.length
 
-rows.each do |row|
+
+maker_rows.each_with_index do |row, i|
 	@brand = Brand.new
-	@brand.name = row.at_xpath('div[2]/h5[1]/a[1]/text()').to_s
-	@brand.pic_url = row.at_xpath('div[1]/a[1]/img[1]/@src').to_s
+	@brand.name = brand_rows[i].at_xpath('a[1]/text()').to_s 
+	@brand.url = "http://car.bitauto.com" + brand_rows[i].at_xpath('a[1]/@href').to_s 
+	@brand.name_pinyin = Pinyin.t(@brand.name, '').downcase.to_s 
+
+    @brand.pic_url = ''
+    @brand.tip = 'bitautocar'
 	
-	#pp @brand
+	maker_num = row.xpath('h2').length
 	
-	maker_num = row.xpath('div[2]/h5').length
-	
+	puts maker_num
 	1.upto(maker_num) do |i|
 		@maker = Maker.new
-		@maker.name = row.at_xpath("div[2]/h5[#{i}]/a[1]/text()").to_s
-		items = []
-		row.xpath("div[2]/p[#{i}]/a").each do |s|
-			item = {}
-			item = {name: s.at_xpath("text()").to_s, title: s.at_xpath("@title").to_s,  href: s.at_xpath("@href").to_s}
+		@maker.name =  row.at_xpath("h2[#{i}]/a[1]/text()").to_s
+		items = []		
+		row.xpath("ul[#{i}]/li").each do |s|
+			item = {}	
+			item = {name: s.at_xpath("div[1]/a[1]/text()").to_s, title: s.at_xpath("div[1]/a[2]/text()").to_s,  href: "http://car.bitauto.com" + s.at_xpath("div[1]/a[1]/@href").to_s}
 			items << item
 		end
 		@maker.serials = items
