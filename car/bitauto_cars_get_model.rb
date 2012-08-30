@@ -56,7 +56,9 @@ puts serials.length
 serials.each_with_index do |s, i|
 
 	puts i.to_s + "\t" + s[:url]
-
+	if i < 22
+		next
+	end
 	@url = s[:url]
 	headers = {"User-Agent" => "google",
 		"From" => "google",
@@ -80,54 +82,28 @@ serials.each_with_index do |s, i|
 			#puts item.to_s.strip_tag
 			#here get name, url, year
 			name = item.to_s.strip_tag
-			url = item.at_xpath('@href').to_s
+			href = item.at_xpath('@href').to_s
 
 			puts  "name : #{item.to_s.strip_tag}"
 			puts  "href : #{item.at_xpath('@href')}"
 			puts  "year : #{year}"
 
-			@qqcar = Qqcar.find_or_create_by(url: url)
+			@qqcar = Qqcar.find_or_create_by(url: href)
 			@qqcar.name = name
 			@qqcar.name_pinyin = Pinyin.t(name, '').downcase.to_s
 			@qqcar.brand = s[:brand]
 			@qqcar.series = s[:series]
 			@qqcar.maker = s[:maker]
-			#@qqcar.url = url
-			pp @qqcar
-			#@qqcar.save()			
+			@qqcar.year = year
+			@qqcar.tip = "bitautocar"
+			@qqcar.url = href
+			#pp @qqcar
+			@qqcar.save()			
 
 		end
 
 	end
   
-	break
-	return
-	
-	rows = @doc.xpath('//table[@class = "data4"]/tr')
-
-	rows.each do |row|
-		name = row.at_xpath('td[1]/a[1]/text()').to_s
-		url = "http://data.auto.qq.com" + row.at_xpath('td[1]/a[1]/@href').to_s
-		
-		if name != ""
-			puts name
-			#puts "well"
-			@qqcar = Qqcar.find_or_create_by(url: url)
-			@qqcar.name = name
-			@qqcar.name_pinyin = Pinyin.t(name, '').downcase.to_s
-			@qqcar.brand = s[:brand]
-			@qqcar.series = s[:series]
-			@qqcar.maker = s[:maker]
-			#@qqcar.url = url
-			
-			@qqcar.save()
-
-		end
-	end
-	
-	
-	#break
-	#@qqcar = Qqcar.new
 	
 end
 

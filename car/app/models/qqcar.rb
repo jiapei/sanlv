@@ -8,8 +8,10 @@ class Qqcar
   field :brand, type: String
   field :series, type: String
   field :maker, type: String
+  field :year, type: String
   
   field :url, type: String
+  field :tip, type: String
   field :price, type: String
   field :all_price, type: String
 
@@ -17,6 +19,8 @@ class Qqcar
   
   has_one :cache_html, class_name: "QqCacheHtml"
   embeds_many  :parameters
+  
+  scope :bitautocar, where(tip: "bitautocar").asc(:created_at)
 end
 
 
