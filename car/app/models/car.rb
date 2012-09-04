@@ -10,6 +10,8 @@ class Car
   
   has_one :cache_html
   embeds_many  :parameters
+  
+  scope :sinacar, asc(:created_at)
 end
 
 class CacheHtml

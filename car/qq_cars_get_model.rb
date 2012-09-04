@@ -59,9 +59,14 @@ serials.each_with_index do |s, i|
 	puts i.to_s + "\t" + s[:url]
 	#error 219      http://data.auto.qq.com/car_serial/742/index.shtml
 	#error 460      
-	#if i < 460
-	#	next
-	#end
+	if i > 219
+		break
+	
+	end	
+	if i != 219
+		next
+	end	
+
 
 	
 	@url = s[:url]
@@ -72,7 +77,8 @@ serials.each_with_index do |s, i|
 	#html_stream = open(@url, headers).read.strip
 	html_stream = open(@url).read.strip
 	begin
-		html_stream.encode!('utf-8', 'gbk')
+		html_stream.encode('utf-8',  'gbk', replace: nil)
+		#html_stream.force_encoding("utf-8").encode("utf-8",  replace: nil)
 	rescue Encoding::InvalidByteSequenceError
 		@file_to_write.puts "error from url : #{@url}"
 		@file_to_write.puts $!
@@ -102,6 +108,7 @@ serials.each_with_index do |s, i|
 			#@qqcar.url = url
 			
 			@qqcar.save()
+			puts "saved"
 
 		end
 	end

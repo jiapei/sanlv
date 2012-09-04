@@ -21,6 +21,7 @@ class Qqcar
   embeds_many  :parameters
   
   scope :bitautocar, where(tip: "bitautocar").asc(:created_at)
+  scope :bitautocar2, where(tip: "bitautocar")
 end
 
 

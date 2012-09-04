@@ -1,0 +1,2 @@
+error from url : http://data.auto.qq.com/car_serial/742/index.shtml
+"\x92" on GB2312
