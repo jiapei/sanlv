@@ -1,55 +1,4 @@
-﻿#encoding: UTF-8
-require 'rubygems'
-require 'mongoid'
-require 'nokogiri'
-require 'open-uri'
-require 'logger'
-
-
-
-Dir.glob("#{File.dirname(__FILE__)}/app/models/*.rb") do |lib|
-  require lib
-end
-
-
-#ENV['MONGOID_ENV'] = 'localcar'
-ENV['MONGOID_ENV'] = 'development'
-
-Mongoid.load!("config/mongoid.yml")
-class String
-    def br_to_new_line
-        self.gsub('<br>', "\n")
-    end
-    def n_to_nil
-        self.gsub('\n', "")
-    end	
-    def strip_tag
-        self.gsub(%r[<[^>]*>], '').gsub(/\t|\n|\r/, ' ')
-    end
-end #String
-class IoFactory
-	attr_reader :file
-	def self.init file
-		@file = file
-		if @file.nil?
-			puts 'Can Not Init File To Write'
-			exit
-		end #if
-		File.open @file, 'a'
-	end     
-end #IoFactory
-
-def create_file_to_write
-	file_path = File.join('.', "bitauto-#{Time.now.to_formatted_s(:number) }.txt")
-	@file_to_write = IoFactory.init(file_path)
-end #create_file_to_write
-
-create_file_to_write
-
-
-@bitautocar = Qqcar.bitautocar2
-@total = @bitautocar.count
-	@title = %w(上市日期(年)
+上市日期(年)
 年款
 进气型式
 变速器型式
@@ -327,20 +276,3 @@ NCAP碰撞测试
 主动安全-其他
 分动箱档数
 行李箱内部高度
-)
-@bitautocar.each_with_index do |car, i|
-
-	puts "#{i}/#{@total}:#{car.brand}"
-	item = []
-	item = "#{car.brand}\t#{car.maker}\t#{car.series}\t#{car.year}\t"
-	@title.each do |t|
-		car.parameters.each do |p|
-			item << p.value if (t.eql?(p.name))
-		end	
-		item << "\t"
-	end
-	@file_to_write.puts item
-	
-	#break
-end
-	
