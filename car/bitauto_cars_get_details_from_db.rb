@@ -332,7 +332,7 @@ NCAP碰撞测试
 
 	puts "#{i}/#{@total}:#{car.brand}"
 	item = []
-	item = "#{car.brand}\t#{car.maker}\t#{car.series}\t#{car.year}\t"
+	item = "#{car.brand}\t#{car.maker}\t#{car.series}\t#{car.year}\t#{car.name}\t"
 	@title.each do |t|
 		car.parameters.each do |p|
 			item << p.value if (t.eql?(p.name))
