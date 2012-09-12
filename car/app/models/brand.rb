@@ -10,4 +10,6 @@ class Brand
   field :tip, :type => String
 
   embeds_many :makers
+  
+  scope :bitautocar, where(tip: "bitautocar")
   end

@@ -1,4 +1,4 @@
-class Maker
+class CarMaker
   include Mongoid::Document
   
   field :brand_name, :type => String
@@ -10,6 +10,5 @@ class Maker
   field :code, :type => String
   field :serials, :type => Array
 
-  embedded_in :brand
   has_many :car_serials
   end
