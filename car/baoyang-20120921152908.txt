@@ -1,0 +1,59 @@
+0	http://car.bitauto.com/saab/	<div class="line_box">
+	<div class="QA-q-area">
+		<div class="q-input-area">
+			<strong>萨博-问答</strong>
+			<input type="text" class="q-text" value="请输入关键字" id="txtkey" onfocus="if(this.value!=''&amp;&amp;this.value=='请输入关键字'){this.value='';}" onblur="if(this.value==''){this.value='请输入关键字';}"><span class="q-btn-search">
+				<input type="submit" onclick="if(document.getElementById('txtkey').value=='请输入关键字'||document.getElementById('txtkey').value=='') {window.open('http://www.cheyisou.com/ask/');return false;}window.open('http://www.cheyisou.com/ask/'+encodeURI(document.getElementById('txtkey').value)+'/'); return false;" value="搜索答案"></span> <span class="q-btn-tiwen"><a href="#" target="_blank" onclick="if(document.getElementById('txtkey').value=='请输入关键字')document.getElementById('txtkey').value='';window.open('http://ask.bitauto.com/tiwen/'+encodeURI(document.getElementById('txtkey').value)+''); return false;">
+						我要提问</a></span>
+		</div>
+		<div class="clear">
+		</div>
+		<ul id="data_tab0">
+<li class="current"><a href="javascript:void(0);">全部问题</a></li>
+			<li class=""><a href="javascript:void(0);">已解决</a></li>
+			<li class=""><a href="javascript:void(0);">待解决</a></li>
+			<li class=""><a href="javascript:void(0);">悬赏</a></li>
+			<li class=""><a href="javascript:void(0);">零回复</a></li>
+		</ul>
+<div class="clear">
+		</div>
+	</div>
+	<div class="text_list qa-text-list">
+		<!--全部问答-->
+	<ul style="display: block;" id="data_box0_0">
+<li><a target="_blank" href="http://ask.bitauto.com/detail/3420992/">萨博是前驱还是后驱</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2771509/">在北京哪里有卖2010款新萨博95的4s店？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2732470/">萨博2010款新95在北京上市了吗？哪里能买到？价格大概是多少？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/3352072/">你好，请问成都有萨博汽车卖吗？4S店地址在哪儿？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/78577/">关于贷款的问题</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/558135/">萨博钥匙匹配方法</a></li>
+		</ul>
+<!--已解决--><ul style="display: none;" id="data_box0_1">
+<li><a target="_blank" href="http://ask.bitauto.com/detail/3372704/">听说庞青年又重新收购萨博了，是真的吗？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/3350013/">听说顺义赵全营的北京萨博汽车有限公司.现在又开始招聘了！这个消息可靠吗？有知情人士回复下谢谢！！！！</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/666211/">具体是上海的哪家经销商是25万阿</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/1481236/">车被划伤后最便捷最有效的修复办法是什么</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/1402741/">新疆地区07款萨博9-3Linear 2.0t运动轿车现在还有卖的么？4S店地址在哪里?电话有吗？？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/1398710/">陕西卖萨博9-3Linear 2.0t运动轿车的4S店地址？</a></li>
+		</ul>
+<!--待解决--><ul style="display: none;" id="data_box0_2">
+<li><a target="_blank" href="http://ask.bitauto.com/detail/3420992/">萨博是前驱还是后驱</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2771509/">在北京哪里有卖2010款新萨博95的4s店？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2732470/">萨博2010款新95在北京上市了吗？哪里能买到？价格大概是多少？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/3352072/">你好，请问成都有萨博汽车卖吗？4S店地址在哪儿？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/78577/">关于贷款的问题</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/558135/">萨博钥匙匹配方法</a></li>
+		</ul>
+<!--悬赏--><ul style="display: none;" id="data_box0_3"></ul>
+<!--零回复--><ul style="display: none;" id="data_box0_4">
+<li><a target="_blank" href="http://ask.bitauto.com/detail/3420992/">萨博是前驱还是后驱</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2771509/">在北京哪里有卖2010款新萨博95的4s店？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/2732470/">萨博2010款新95在北京上市了吗？哪里能买到？价格大概是多少？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/3352072/">你好，请问成都有萨博汽车卖吗？4S店地址在哪儿？</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/78577/">关于贷款的问题</a></li>
+					<li><a target="_blank" href="http://ask.bitauto.com/detail/558135/">萨博钥匙匹配方法</a></li>
+		</ul>
+</div>
+	<div class="clear">
+	</div>
+</div>
