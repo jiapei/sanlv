@@ -54,19 +54,11 @@ create_file_to_write
 @brand.each_with_index do |brand, i|
 	detail_url = "#{brand.url}"
 	puts "#{i} : #{detail_url}"
-	@doc = Nokogiri::HTML(open(detail_url).read.strip)
-	
-	#logo_url = @doc.at_xpath('//div[@class = "line_box"]//img/@src')
-	logo_url = @doc.at_css('div.logo_story > dl > dt > img').attr("src")
-	brand_summary = @doc.at_css('div#aa').text.strip_tag.strip
-	logo_summary = @doc.at_css('div#bb').text.strip_tag.strip
-	name_pinyin = Pinyin.t(brand.name, '').downcase.to_s 
 	
 	
-	pp logo_url
 	
-	@file_to_write.puts "#{i}\t#{brand.name}\t#{name_pinyin}\t#{brand_summary}\t#{logo_summary}\t#{logo_url}"
-	break
+	@file_to_write.puts "#{brand.url}"
+	
 
 
 end
