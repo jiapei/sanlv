@@ -1,165 +1,4 @@
-﻿#encoding: utf-8
-require 'rubygems'
-require 'nokogiri'
-require 'open-uri'
-require 'logger'
-require 'pp'
-
-class String
-    def br_to_new_line
-        self.gsub('<br>', "\n")
-    end
-    def n_to_nil
-        self.gsub('\n', "")
-    end	
-    def strip_tag
-        self.gsub(%r[<[^>]*>], '').gsub(/\n|\r/, '')
-    end
-end #String
-
-module SanLv
-    class UrlBuilder
-        attr_reader :domain, :id, :article
-        attr_reader :end_type
-        def initialize id
-			# 80 空滤 101 机滤 127汽滤
-			@domain = %q[http://www.jarparts.com/Products_indexlist.asp?lang=CN&page=]
-			@article = 'article'
-            @end_type = '&SortID=127&keys='
-            @id = id.to_s
-        end     
-        def article_url
-            @domain + id + @end_type
-        end #article_url        
-        def build_article_url page
-            page = page.to_s
-            "#{@domain}#{page}#{@end_type}"
-        end #build_article_url      
-    end #UrlBuilder
-    class ContentWorker
-        attr_reader :url, :doc, :retry_time
-        attr_accessor :page_css, :content_css
-        class << self
-            def log=(log_file)
-                @@log = log_file
-            end #log=
-            def log
-                @@log
-            end
-        end #class
-        def initialize url
-            @url = url
-            define_max_retry_time
-            define_page_css
-            define_content_css
-            get_nokogiri_doc
-            exit if @doc.nil?
-            log_or_output_info
-        end #initialize     
-        def log_or_output_info
-            msg = "processing #{@url}"
-            if @@log
-                @@log.debug msg
-            else
-                puts msg
-            end #if
-        end #log_or_output_info
-        def get_nokogiri_doc
-            times = 0
-			from_encode ="utf-8"
-			to_encode = "utf-8"
-
-            begin
-                @doc = Nokogiri::HTML(open(@url).read.strip)
-				#@doc = @doc.encode!(to_encode, from_encode)
-            rescue
-                @@log.error "Can Not Open [#{@url}]" if @@log
-                times += 1
-                retry if(times < @retry_time)
-            end #begin
-        end #get_nokogiri_doc
-        def define_max_retry_time
-            @retry_time = 3
-        end #define_max_retry_time
-		
-        def define_page_css
-            @page_css = %q[div.pages span]
-        end
-        def define_content_css
-            @content_css = %q[li.at.c.h2]
-        end #define_content_cssea
-		
-        def total_page
-			puts @url
-            page = ''
-            p = doc.at_css(@page_css) 
-            m = p.content.match(/\/\d+/)[0].match(/\d+/)              
-                page = m[0] if m                                
-            page.to_i
-        end #total_page
-		
-		def build_lists &blk
-			lists = []
-			title =  @doc.at_css("div.bt_navigatev1New").text.strip_tag.strip
-			h1 =  @doc.at_css("h1").text.strip_tag.strip
-			
-
-			@doc.xpath('//table[@id = "compare"]/tr/td[1]/a').each do |item|
-				lists << "#{h1}\t#{title}\t#{item.to_s.strip_tag}\t#{item.at_xpath('@href')}"
-				#puts item.to_s.strip_tag
-
-			end
-
-			
-			if block_given?	
-				blk.call(lists)			
-			else
-				puts lists.length
-			end
-			
-			
-		end
-		
-        def build_content &blk
-		
-			rows = @doc.xpath('//table/tr')
-			rows.collect do |row|
-			  detail = row.to_s.strip_tag.strip
-			  #puts detail
-				if block_given?	
-					blk.call(detail)
-				else
-					puts detail
-				end
-			end
-		end #build_content
-    end #ContentWorker
-
-    class IoFactory
-
-        attr_reader :file
-
-        def self.init file
-            @file = file
-            if @file.nil?
-                puts 'Can Not Init File To Write'
-                exit
-            end #if
-            File.open @file, 'a'
-        end     
-
-    end #IoFactory
-
-    class Runner        
-
-            attr_reader :url_builder, :start_url
-            attr_reader :total_page, :file_to_write
-
-            def initialize id
-                init_logger
-                @url_builder = UrlBuilder.new(id)               
-                get_start_url
-				@url_lists = %w(http://car.bitauto.com/quanxinaodia4l/2013/#car_list
+http://car.bitauto.com/quanxinaodia4l/2013/#car_list
 http://car.bitauto.com/quanxinaodia4l/2012/#car_list
 http://car.bitauto.com/quanxinaodia4l/2011/
 http://car.bitauto.com/quanxinaodia4l/2010/
@@ -216,14 +55,14 @@ http://car.bitauto.com/aodir8/2011/#car_list
 http://car.bitauto.com/aodir8/2008/
 http://car.bitauto.com/aodia7/2013/#car_list
 http://car.bitauto.com/aodia7/2011/#car_list
-http://car.bitauto.com/aodia3/2011/#car_list
-http://car.bitauto.com/aodia3/2010/
 http://car.bitauto.com/aoditt/2012/#car_list
 http://car.bitauto.com/aoditt/2011/#car_list
 http://car.bitauto.com/aoditt/2010/
 http://car.bitauto.com/aoditt/2008/
 http://car.bitauto.com/aoditt/2007/
 http://car.bitauto.com/aoditt/2003/
+http://car.bitauto.com/aodia3/2011/#car_list
+http://car.bitauto.com/aodia3/2010/
 http://car.bitauto.com/aodiq3/2012/#car_list
 http://car.bitauto.com/aodis5/2012/#car_list
 http://car.bitauto.com/aodis5/2011/#car_list
@@ -456,6 +295,8 @@ http://car.bitauto.com/siyucivic/2006/
 http://car.bitauto.com/siming/2012/#car_list
 http://car.bitauto.com/siborui/2009/#car_list
 http://car.bitauto.com/ailishen/2012/#car_list
+http://car.bitauto.com/fengfan/2012/#car_list
+http://car.bitauto.com/fengfan/2009/
 http://car.bitauto.com/dibadaiyage/2013/#car_list
 http://car.bitauto.com/dibadaiyage/2012/#car_list
 http://car.bitauto.com/dibadaiyage/2011/
@@ -470,8 +311,6 @@ http://car.bitauto.com/dibadaiyage/2003/
 http://car.bitauto.com/dibadaiyage/2001/
 http://car.bitauto.com/dibadaiyage/2000/
 http://car.bitauto.com/dibadaiyage/1998/
-http://car.bitauto.com/fengfan/2012/#car_list
-http://car.bitauto.com/fengfan/2009/
 http://car.bitauto.com/xinfeidu/2012/#car_list
 http://car.bitauto.com/xinfeidu/2011/#car_list
 http://car.bitauto.com/xinfeidu/2008/
@@ -655,8 +494,8 @@ http://car.bitauto.com/biaozhi406/2003/
 http://car.bitauto.com/biaozhi406/2002/
 http://car.bitauto.com/307/2006/
 http://car.bitauto.com/biaozhi307sw/2007/
-http://car.bitauto.com/206/2007/
 http://car.bitauto.com/coupe406/2002/
+http://car.bitauto.com/206/2007/
 http://car.bitauto.com/206sw/2006/
 http://car.bitauto.com/baoshijiecayenne/2012/#car_list
 http://car.bitauto.com/baoshijiecayenne/2011/#car_list
@@ -749,7 +588,6 @@ http://car.bitauto.com/linghui/2003/
 http://car.bitauto.com/hafuh6/2012/#car_list
 http://car.bitauto.com/hafuh6/2011/#car_list
 http://car.bitauto.com/hafum4/2012/#car_list
-http://car.bitauto.com/tengyic30/2013/#car_list
 http://car.bitauto.com/tengyic30/2012/#car_list
 http://car.bitauto.com/tengyic30/2010/
 http://car.bitauto.com/tengyic50/2012/#car_list
@@ -853,10 +691,6 @@ http://car.bitauto.com/changanxiaoka/2003/
 http://car.bitauto.com/changanxiaoka/1999/
 http://car.bitauto.com/xunlong/2010/#car_list
 http://car.bitauto.com/changancm8/2004/
-http://car.bitauto.com/changanleimeng/2006/
-http://car.bitauto.com/changanleimeng/2005/
-http://car.bitauto.com/changanleimeng/2004/
-http://car.bitauto.com/changanleimeng/2003/
 http://car.bitauto.com/changanxingyun/2007/
 http://car.bitauto.com/changanxingyun/2006/
 http://car.bitauto.com/changanxingyun/2004/
@@ -865,6 +699,10 @@ http://car.bitauto.com/changanxingyun/2000/
 http://car.bitauto.com/changanxingyun/1999/
 http://car.bitauto.com/changanxingyun/1996/
 http://car.bitauto.com/changanxingyun/1990/
+http://car.bitauto.com/changanleimeng/2006/
+http://car.bitauto.com/changanleimeng/2005/
+http://car.bitauto.com/changanleimeng/2004/
+http://car.bitauto.com/changanleimeng/2003/
 http://car.bitauto.com/changanyuntong/2006/
 http://car.bitauto.com/changanxuehu/2003/
 http://car.bitauto.com/liebaoct5/2011/#car_list
@@ -1147,13 +985,13 @@ http://car.bitauto.com/fengshens30liangxiang/2012/#car_list
 http://car.bitauto.com/fengshens30liangxiang/2011/
 http://car.bitauto.com/fengshens30liangxiang/2010/
 http://car.bitauto.com/daoqikailing/2007/#car_list
-http://car.bitauto.com/kuwei/2011/#car_list
-http://car.bitauto.com/kuwei/2010/
-http://car.bitauto.com/kuwei/2009/
 http://car.bitauto.com/daoqikubo/2011/#car_list
 http://car.bitauto.com/daoqikubo/2010/
 http://car.bitauto.com/daoqikubo/2009/
 http://car.bitauto.com/daoqikubo/2008/
+http://car.bitauto.com/kuwei/2011/#car_list
+http://car.bitauto.com/kuwei/2010/
+http://car.bitauto.com/kuwei/2009/
 http://car.bitauto.com/daoqigongyang/2011/#car_list
 http://car.bitauto.com/daoqigongyang/2006/
 http://car.bitauto.com/daoqigongyang/2003/
@@ -1556,8 +1394,8 @@ http://car.bitauto.com/zhongyi/2006/#car_list
 http://car.bitauto.com/zhongyi/2005/
 http://car.bitauto.com/zhongyi/2004/
 http://car.bitauto.com/zhongyi/2000/
-http://car.bitauto.com/hafeidanshuangpai/2010/#car_list
 http://car.bitauto.com/saibaovxi/2007/
+http://car.bitauto.com/hafeidanshuangpai/2010/#car_list
 http://car.bitauto.com/minyiyipaiban/2010/#car_list
 http://car.bitauto.com/songhuajiang/2006/
 http://car.bitauto.com/songhuajiang/2000/
@@ -1768,15 +1606,15 @@ http://car.bitauto.com/disandaigeruisi/2010/#car_list
 http://car.bitauto.com/disandaigeruisi/2009/#car_list
 http://car.bitauto.com/haixing/2011/#car_list
 http://car.bitauto.com/haixing/2009/#car_list
+http://car.bitauto.com/badaosuv-2763/2009/#car_list
+http://car.bitauto.com/badaosuv-2763/2007/#car_list
+http://car.bitauto.com/badaosuv-2763/2008/
 http://car.bitauto.com/jinbeigeruisimpv/2011/#car_list
 http://car.bitauto.com/jinbeigeruisimpv/2008/#car_list
 http://car.bitauto.com/jinbeigeruisimpv/2007/
 http://car.bitauto.com/jinbeigeruisimpv/2005/
 http://car.bitauto.com/jinbeigeruisimpv/2004/
 http://car.bitauto.com/jinbeigeruisimpv/2001/
-http://car.bitauto.com/badaosuv-2763/2009/#car_list
-http://car.bitauto.com/badaosuv-2763/2007/#car_list
-http://car.bitauto.com/badaosuv-2763/2008/
 http://car.bitauto.com/dahaishi-3737/2012/#car_list
 http://car.bitauto.com/dahaishi-3737/2011/#car_list
 http://car.bitauto.com/dahaishi-3737/2009/
@@ -1877,9 +1715,9 @@ http://car.bitauto.com/kaidilakekaileide/2008/#car_list
 http://car.bitauto.com/kaidilakekaileide/2005/
 http://car.bitauto.com/kaidilakekaileide/2004/
 http://car.bitauto.com/kaidilakekaileide/1986/
+http://car.bitauto.com/kaidilakediwei/2006/#car_list
 http://car.bitauto.com/kaidilakexlr/2008/#car_list
 http://car.bitauto.com/kaidilakexlr/2005/
-http://car.bitauto.com/kaidilakediwei/2006/#car_list
 http://car.bitauto.com/kaileidehybird/2011/#car_list
 http://car.bitauto.com/kaileidehybird/2010/
 http://car.bitauto.com/kaileidehybird/2009/
@@ -1908,9 +1746,9 @@ http://car.bitauto.com/kairuiyouyou/2012/#car_list
 http://car.bitauto.com/kairuiyouyou/2011/#car_list
 http://car.bitauto.com/kairuiyouya/2011/#car_list
 http://car.bitauto.com/kairuiyouya/2007/#car_list
+http://car.bitauto.com/youyi/2009/#car_list
 http://car.bitauto.com/yousheng/2012/#car_list
 http://car.bitauto.com/yousheng/2011/#car_list
-http://car.bitauto.com/youyi/2009/#car_list
 http://car.bitauto.com/youpai-2777/2011/#car_list
 http://car.bitauto.com/youpai-2777/2009/#car_list
 http://car.bitauto.com/youjin/2011/#car_list
@@ -2048,13 +1886,13 @@ http://car.bitauto.com/leikesasilx/2012/#car_list
 http://car.bitauto.com/leikesasilx/2009/
 http://car.bitauto.com/leikesasilx/2007/
 http://car.bitauto.com/leikesasilx/2005/
+http://car.bitauto.com/lfa/2010/#car_list
 http://car.bitauto.com/leikesasils/2010/#car_list
 http://car.bitauto.com/leikesasils/2009/
 http://car.bitauto.com/leikesasils/2007/
 http://car.bitauto.com/leikesasils/2006/
 http://car.bitauto.com/leikesasils/2004/
 http://car.bitauto.com/leikesasils/1994/
-http://car.bitauto.com/lfa/2010/#car_list
 http://car.bitauto.com/leikesasigx/2012/#car_list
 http://car.bitauto.com/leikesasigx/2010/#car_list
 http://car.bitauto.com/leikesasigx/2003/
@@ -2259,953 +2097,3 @@ http://car.bitauto.com/mashaladicoupe/2003/
 http://car.bitauto.com/maikailunmp412c/2012/#car_list
 http://car.bitauto.com/meiyalucheng/2010/#car_list
 http://car.bitauto.com/meiyalucheng/2007/
-http://car.bitauto.com/meiyaqibing/2010/#car_list
-http://car.bitauto.com/meiyaqibing/2005/
-http://car.bitauto.com/meiyaqibing/2004/
-http://car.bitauto.com/meiyashunfeng/2004/
-http://car.bitauto.com/meiyahaishi/2004/
-http://car.bitauto.com/luxgen7suv/2012/#car_list
-http://car.bitauto.com/luxgen7suv/2011/#car_list
-http://car.bitauto.com/luxgen7ceo/2012/#car_list
-http://car.bitauto.com/ougemdx/2011/#car_list
-http://car.bitauto.com/ougemdx/2010/#car_list
-http://car.bitauto.com/ougemdx/2009/
-http://car.bitauto.com/ougerdxhaiwai/2012/#car_list
-http://car.bitauto.com/ougezdx/2011/#car_list
-http://car.bitauto.com/ougerl/2009/#car_list
-http://car.bitauto.com/ougetl/2012/#car_list
-http://car.bitauto.com/ougetl/2010/#car_list
-http://car.bitauto.com/ougetl/2005/
-http://car.bitauto.com/oubaoandela/2012/#car_list
-http://car.bitauto.com/oubaoandela/2011/#car_list
-http://car.bitauto.com/oubaoandela/2008/
-http://car.bitauto.com/oubaoyate/2010/#car_list
-http://car.bitauto.com/oubaoyate/2008/
-http://car.bitauto.com/oubaoyate/2007/
-http://car.bitauto.com/oubaoyate/2006/
-http://car.bitauto.com/oubaoyate/2005/
-http://car.bitauto.com/oubaoyate/1999/
-http://car.bitauto.com/oubaosaifeili/2006/
-http://car.bitauto.com/oubaosaifeili/2005/
-http://car.bitauto.com/oubaosaifeili/2002/
-http://car.bitauto.com/oumeijia/1994/
-http://car.bitauto.com/oubaoweida/2007/
-http://car.bitauto.com/oubaoweida/2006/
-http://car.bitauto.com/oubaoweida/2005/
-http://car.bitauto.com/oubaoweida/2003/
-http://car.bitauto.com/oubaoweida/1998/
-http://car.bitauto.com/oujieli/2002/
-http://car.bitauto.com/yategtc/2007/
-http://car.bitauto.com/yategtc/2005/
-http://car.bitauto.com/yatetwintop/2007/
-http://car.bitauto.com/yatea/2008/
-http://car.bitauto.com/oulang-3561/2012/#car_list
-http://car.bitauto.com/dongfengyuedaqiyak2/2012/#car_list
-http://car.bitauto.com/dongfengyuedaqiyak2/2011/#car_list
-http://car.bitauto.com/k5/2012/#car_list
-http://car.bitauto.com/k5/2011/#car_list
-http://car.bitauto.com/dongfengyuedaqiyasl/2012/#car_list
-http://car.bitauto.com/dongfengyuedaqiyasl/2010/#car_list
-http://car.bitauto.com/furuidi/2012/#car_list
-http://car.bitauto.com/furuidi/2011/#car_list
-http://car.bitauto.com/furuidi/2009/
-http://car.bitauto.com/shipao/2012/#car_list
-http://car.bitauto.com/shipao/2011/#car_list
-http://car.bitauto.com/shipao/2009/
-http://car.bitauto.com/shipao/2007/
-http://car.bitauto.com/sailatu/2012/#car_list
-http://car.bitauto.com/sailatu/2010/#car_list
-http://car.bitauto.com/sailatu/2009/
-http://car.bitauto.com/sailatu/2007/
-http://car.bitauto.com/sailatu/2006/
-http://car.bitauto.com/sailatu/2005/
-http://car.bitauto.com/k2liangxiang/2012/#car_list
-http://car.bitauto.com/soul/2012/#car_list
-http://car.bitauto.com/soul/2010/#car_list
-http://car.bitauto.com/rioruiou/2008/#car_list
-http://car.bitauto.com/rioruiou/2007/#car_list
-http://car.bitauto.com/sailatuoufeng/2008/#car_list
-http://car.bitauto.com/dongfengyuedaqiyak3/2012/#car_list
-http://car.bitauto.com/qianlima/2006/
-http://car.bitauto.com/qianlima/2005/
-http://car.bitauto.com/qianlima/2004/
-http://car.bitauto.com/qianlima/2003/
-http://car.bitauto.com/yuanjian/2006/
-http://car.bitauto.com/yuanjian/2005/
-http://car.bitauto.com/yuanjian/2004/
-http://car.bitauto.com/jiahua/2006/
-http://car.bitauto.com/jiahua/2005/
-http://car.bitauto.com/jiahua/2004/
-http://car.bitauto.com/jiahua/2002/
-http://car.bitauto.com/pulaite/2002/
-http://car.bitauto.com/baoju/2003/
-http://car.bitauto.com/suolantuo/2012/#car_list
-http://car.bitauto.com/suolantuo/2011/#car_list
-http://car.bitauto.com/suolantuo/2010/
-http://car.bitauto.com/suolantuo/2009/
-http://car.bitauto.com/suolantuo/2008/
-http://car.bitauto.com/suolantuo/2006/
-http://car.bitauto.com/suolantuo/2005/
-http://car.bitauto.com/xinjiale/2011/#car_list
-http://car.bitauto.com/xinjiale/2008/
-http://car.bitauto.com/xinjiale/2007/
-http://car.bitauto.com/xinjiale/2006/
-http://car.bitauto.com/xinjiale/2002/
-http://car.bitauto.com/xinjiale/2001/
-http://car.bitauto.com/xinjiale/2000/
-http://car.bitauto.com/cadenza/2012/#car_list
-http://car.bitauto.com/cadenza/2011/#car_list
-http://car.bitauto.com/barui/2008/#car_list
-http://car.bitauto.com/shuma/2011/#car_list
-http://car.bitauto.com/shuma/2010/#car_list
-http://car.bitauto.com/vq/2011/#car_list
-http://car.bitauto.com/vq/2006/
-http://car.bitauto.com/shipao-2024/2007/
-http://car.bitauto.com/shipao-2024/2006/
-http://car.bitauto.com/oufeilaisi/2009/
-http://car.bitauto.com/oufeilaisi/2008/
-http://car.bitauto.com/oufeilaisi/2007/
-http://car.bitauto.com/oufeilaisi/2005/
-http://car.bitauto.com/oufeilaisi/2000/
-http://car.bitauto.com/qiyajiahua/2002/
-http://car.bitauto.com/qiyajiahua/2001/
-http://car.bitauto.com/ruihu3/2012/#car_list
-http://car.bitauto.com/ruihu3/2011/#car_list
-http://car.bitauto.com/ruihu3/2010/
-http://car.bitauto.com/ruihu3/2009/
-http://car.bitauto.com/ruihu3/2007/
-http://car.bitauto.com/ruihu3/2006/
-http://car.bitauto.com/ruihu3/2005/
-http://car.bitauto.com/qq3/2012/#car_list
-http://car.bitauto.com/qq3/2011/#car_list
-http://car.bitauto.com/qq3/2009/
-http://car.bitauto.com/qq3/2007/
-http://car.bitauto.com/qq3/2006/
-http://car.bitauto.com/qq3/2005/
-http://car.bitauto.com/qq3/2004/
-http://car.bitauto.com/qq3/2003/
-http://car.bitauto.com/qiyune5/2012/#car_list
-http://car.bitauto.com/qiyune5/2011/#car_list
-http://car.bitauto.com/fengyun2liangxiang/2010/#car_list
-http://car.bitauto.com/a3sanxiang/2012/#car_list
-http://car.bitauto.com/a3sanxiang/2010/#car_list
-http://car.bitauto.com/a3sanxiang/2009/
-http://car.bitauto.com/a3sanxiang/2008/
-http://car.bitauto.com/qiyun2/2012/#car_list
-http://car.bitauto.com/qiyun2/2010/#car_list
-http://car.bitauto.com/qiyun1/2012/#car_list
-http://car.bitauto.com/qiyun1/2010/#car_list
-http://car.bitauto.com/fengyun2sanxiang/2010/#car_list
-http://car.bitauto.com/a3liangxiang/2012/#car_list
-http://car.bitauto.com/a3liangxiang/2010/#car_list
-http://car.bitauto.com/a3liangxiang/2009/
-http://car.bitauto.com/qiruia1/2011/#car_list
-http://car.bitauto.com/qiruia1/2009/#car_list
-http://car.bitauto.com/qiruia1/2007/
-http://car.bitauto.com/dongfangzhizi/2012/#car_list
-http://car.bitauto.com/dongfangzhizi/2007/#car_list
-http://car.bitauto.com/dongfangzhizi/2006/
-http://car.bitauto.com/dongfangzhizi/2005/
-http://car.bitauto.com/dongfangzhizi/2004/
-http://car.bitauto.com/dongfangzhizi/2003/
-http://car.bitauto.com/qiyun5/2012/#car_list
-http://car.bitauto.com/qiyun3/2010/#car_list
-http://car.bitauto.com/qiruiqqme/2010/#car_list
-http://car.bitauto.com/qiruiqqme/2009/#car_list
-http://car.bitauto.com/qiruia5/2009/
-http://car.bitauto.com/qiruia5/2007/
-http://car.bitauto.com/qiruia5/2006/
-http://car.bitauto.com/qq6/2010/
-http://car.bitauto.com/qq6/2007/
-http://car.bitauto.com/qq6/2006/
-http://car.bitauto.com/qiyun/2008/
-http://car.bitauto.com/qiyun/2007/
-http://car.bitauto.com/qiyun/2006/
-http://car.bitauto.com/qiyun/2005/
-http://car.bitauto.com/qiyun/2004/
-http://car.bitauto.com/qiyun/2003/
-http://car.bitauto.com/dongfangzhizicross/2009/
-http://car.bitauto.com/dongfangzhizicross/2008/
-http://car.bitauto.com/dongfangzhizicross/2007/
-http://car.bitauto.com/dongfangzhizicross/2006/
-http://car.bitauto.com/fengyun/2005/
-http://car.bitauto.com/fengyun/2004/
-http://car.bitauto.com/fengyun/2003/
-http://car.bitauto.com/fengyun/2002/
-http://car.bitauto.com/qichen-3316/2012/#car_list
-http://car.bitauto.com/d50liangxiang/2012/#car_list
-http://car.bitauto.com/jingjizhe/2002/
-http://car.bitauto.com/qinglingqingka/2011/#car_list
-http://car.bitauto.com/qinglingzhongxingshangyongche/2011/#car_list
-http://car.bitauto.com/qinglingfzhongxingshangyongche/2011/#car_list
-http://car.bitauto.com/qinglingduogongnengche/2004/
-http://car.bitauto.com/xuanyi/2012/#car_list
-http://car.bitauto.com/xuanyi/2009/
-http://car.bitauto.com/xuanyi/2008/
-http://car.bitauto.com/xuanyi/2007/
-http://car.bitauto.com/xuanyi/2006/
-http://car.bitauto.com/xiaoke/2012/#car_list
-http://car.bitauto.com/xiaoke/2011/#car_list
-http://car.bitauto.com/xiaoke/2010/
-http://car.bitauto.com/xiaoke/2009/
-http://car.bitauto.com/xiaoke/2008/
-http://car.bitauto.com/xiaoke/2007/
-http://car.bitauto.com/yangguang/2011/#car_list
-http://car.bitauto.com/yangguang/2005/
-http://car.bitauto.com/yangguang/2004/
-http://car.bitauto.com/yangguang/2002/
-http://car.bitauto.com/liwei/2010/#car_list
-http://car.bitauto.com/liwei/2009/
-http://car.bitauto.com/liwei/2008/
-http://car.bitauto.com/liwei/2007/
-http://car.bitauto.com/xintianlai/2012/#car_list
-http://car.bitauto.com/xintianlai/2011/#car_list
-http://car.bitauto.com/xintianlai/2010/
-http://car.bitauto.com/xintianlai/2009/
-http://car.bitauto.com/xintianlai/2008/
-http://car.bitauto.com/xintianlai/2007/
-http://car.bitauto.com/xintianlai/2006/
-http://car.bitauto.com/xintianlai/2004/
-http://car.bitauto.com/qida/2011/#car_list
-http://car.bitauto.com/qida/2009/
-http://car.bitauto.com/qida/2008/
-http://car.bitauto.com/qida/2006/
-http://car.bitauto.com/qida/2005/
-http://car.bitauto.com/qijun/2012/#car_list
-http://car.bitauto.com/qijun/2010/
-http://car.bitauto.com/qijun/2008/
-http://car.bitauto.com/march-3243/2010/#car_list
-http://car.bitauto.com/yida/2009/#car_list
-http://car.bitauto.com/yida/2008/#car_list
-http://car.bitauto.com/yida/2006/
-http://car.bitauto.com/meilunnu/2011/#car_list
-http://car.bitauto.com/lanniao/2005/
-http://car.bitauto.com/lanniao/2004/
-http://car.bitauto.com/lanniao/2003/
-http://car.bitauto.com/lanniao/2002/
-http://car.bitauto.com/lanniao/2001/
-http://car.bitauto.com/lanniao/1999/
-http://car.bitauto.com/junyi/2006/
-http://car.bitauto.com/shuaike/2011/#car_list
-http://car.bitauto.com/shuaike/2010/#car_list
-http://car.bitauto.com/zhengzhourichannv200/2011/#car_list
-http://car.bitauto.com/zhengzhourichannv200/2010/#car_list
-http://car.bitauto.com/palading/2006/#car_list
-http://car.bitauto.com/aoding/2007/#car_list
-http://car.bitauto.com/ruiqipika/2010/#car_list
-http://car.bitauto.com/ruiqipika/2009/#car_list
-http://car.bitauto.com/ruiqiduogongnengshangyongche/2010/#car_list
-http://car.bitauto.com/ruiqiduogongnengshangyongche/2009/#car_list
-http://car.bitauto.com/yuxuan/2009/#car_list
-http://car.bitauto.com/d22pika/2009/#car_list
-http://car.bitauto.com/d22pika/2008/
-http://car.bitauto.com/d22pika/2007/
-http://car.bitauto.com/d22pika/2000/
-http://car.bitauto.com/d22pika/1999/
-http://car.bitauto.com/zhengzhourichanzn6493/2012/#car_list
-http://car.bitauto.com/zhengzhourichanzn6493/2009/
-http://car.bitauto.com/zhengzhourichanzn6493/2007/
-http://car.bitauto.com/palaqi/2009/#car_list
-http://car.bitauto.com/kaipusida/2009/#car_list
-http://car.bitauto.com/richangtr/2013/#car_list
-http://car.bitauto.com/richangtr/2012/#car_list
-http://car.bitauto.com/richangtr/2011/
-http://car.bitauto.com/richangtr/2010/
-http://car.bitauto.com/richangtr/2008/
-http://car.bitauto.com/richan370z/2010/#car_list
-http://car.bitauto.com/richantule/2011/#car_list
-http://car.bitauto.com/richantule/2006/
-http://car.bitauto.com/richantule/2000/
-http://car.bitauto.com/richanguishi/2012/#car_list
-http://car.bitauto.com/richanguishi/2011/#car_list
-http://car.bitauto.com/richanguishi/2005/
-http://car.bitauto.com/richanbilian/2011/#car_list
-http://car.bitauto.com/richanbilian/2010/#car_list
-http://car.bitauto.com/richanbilian/2007/
-http://car.bitauto.com/jiabenhaiwai/2001/#car_list
-http://car.bitauto.com/richanjukehaiwai/2012/#car_list
-http://car.bitauto.com/richan350z/2006/
-http://car.bitauto.com/richanfengdu/2005/
-http://car.bitauto.com/richanfengdu/2004/
-http://car.bitauto.com/richanfengdu/2002/
-http://car.bitauto.com/gongjue/1991/
-http://car.bitauto.com/gongjue/1986/
-http://car.bitauto.com/richanfengya/2005/
-http://car.bitauto.com/richanmeilunnu/2006/
-http://car.bitauto.com/richanqijun/2006/
-http://car.bitauto.com/rongwein1/2012/#car_list
-http://car.bitauto.com/rongwein1/2011/#car_list
-http://car.bitauto.com/rongwei550/2012/#car_list
-http://car.bitauto.com/rongwei550/2010/#car_list
-http://car.bitauto.com/rongwei550/2009/
-http://car.bitauto.com/rongwei550/2008/
-http://car.bitauto.com/rongweisuv/2011/#car_list
-http://car.bitauto.com/rongweir95/2012/#car_list
-http://car.bitauto.com/rongwei750/2011/#car_list
-http://car.bitauto.com/rongwei750/2010/
-http://car.bitauto.com/rongwei750/2009/
-http://car.bitauto.com/rongwei750/2008/
-http://car.bitauto.com/ruiqix1/2012/#car_list
-http://car.bitauto.com/ruiqix1/2011/#car_list
-http://car.bitauto.com/ruiqix1/2010/
-http://car.bitauto.com/ruiqig5/2012/#car_list
-http://car.bitauto.com/ruiqig5/2011/#car_list
-http://car.bitauto.com/ruiqig5/2010/
-http://car.bitauto.com/ruiqig3/2012/#car_list
-http://car.bitauto.com/ruiqim1/2011/#car_list
-http://car.bitauto.com/ruiqim1/2010/
-http://car.bitauto.com/ruiqim1/2009/
-http://car.bitauto.com/ruiqig6/2011/#car_list
-http://car.bitauto.com/ruiqim5/2010/#car_list
-http://car.bitauto.com/ruiqi2/2007/
-http://car.bitauto.com/mingrui/2013/#car_list
-http://car.bitauto.com/mingrui/2012/#car_list
-http://car.bitauto.com/mingrui/2010/
-http://car.bitauto.com/mingrui/2009/
-http://car.bitauto.com/mingrui/2008/
-http://car.bitauto.com/mingrui/2007/
-http://car.bitauto.com/haorui/2012/#car_list
-http://car.bitauto.com/haorui/2010/#car_list
-http://car.bitauto.com/jingrui/2012/#car_list
-http://car.bitauto.com/jingrui/2011/#car_list
-http://car.bitauto.com/jingrui/2009/
-http://car.bitauto.com/jingrui/2008/
-http://car.bitauto.com/mingruirs/2010/#car_list
-http://car.bitauto.com/sikedafabiya/2001/#car_list
-http://car.bitauto.com/sikedafabiya/2002/
-http://car.bitauto.com/sikedasupai/2005/#car_list
-http://car.bitauto.com/sikedasupai/2001/
-http://car.bitauto.com/sikedaouya/2004/#car_list
-http://car.bitauto.com/sikedafuleixiya/1995/
-http://car.bitauto.com/sikedafuleixiya/1992/
-http://car.bitauto.com/lanseyishen/2012/#car_list
-http://car.bitauto.com/lanseyishen/2011/#car_list
-http://car.bitauto.com/lanseyishen/2010/
-http://car.bitauto.com/lanse/2012/#car_list
-http://car.bitauto.com/lanse/2010/#car_list
-http://car.bitauto.com/lanse/2007/
-http://car.bitauto.com/lanse/2006/
-http://car.bitauto.com/junge/2011/#car_list
-http://car.bitauto.com/junge/2010/
-http://car.bitauto.com/junge/2009/
-http://car.bitauto.com/gelan/2012/#car_list
-http://car.bitauto.com/gelan/2009/#car_list
-http://car.bitauto.com/gelan/2007/
-http://car.bitauto.com/gelan/2006/
-http://car.bitauto.com/lingshen/2007/
-http://car.bitauto.com/lingshen/2006/
-http://car.bitauto.com/lingshen/2005/
-http://car.bitauto.com/lingshen/2004/
-http://car.bitauto.com/pajieluo/2011/#car_list
-http://car.bitauto.com/pajieluo/2008/#car_list
-http://car.bitauto.com/pajieluo/2007/
-http://car.bitauto.com/pajieluo/2006/
-http://car.bitauto.com/pajieluo/2005/
-http://car.bitauto.com/pajieluo/2004/
-http://car.bitauto.com/sanlingasx/2012/#car_list
-http://car.bitauto.com/sanlingasx/2011/
-http://car.bitauto.com/oulandeex/2012/#car_list
-http://car.bitauto.com/oulandeex/2011/
-http://car.bitauto.com/oulandeex/2010/
-http://car.bitauto.com/oulandeex/2009/
-http://car.bitauto.com/oulandeex/2007/
-http://car.bitauto.com/oulandeex/2006/
-http://car.bitauto.com/oulandeex/2005/
-http://car.bitauto.com/sanlingpajieluo/2012/#car_list
-http://car.bitauto.com/sanlingpajieluo/2011/
-http://car.bitauto.com/sanlingpajieluo/2010/
-http://car.bitauto.com/sanlingpajieluo/2009/
-http://car.bitauto.com/sanlingpajieluo/2006/
-http://car.bitauto.com/sanlingpajieluo/2005/
-http://car.bitauto.com/sanlingpajieluo/2004/
-http://car.bitauto.com/sanlingpajieluo/2001/
-http://car.bitauto.com/sanlingpajieluo/1993/
-http://car.bitauto.com/lanseyihaolushen/2008/#car_list
-http://car.bitauto.com/lanseyihaolushen/2006/
-http://car.bitauto.com/pajieluosupao-2995/2011/#car_list
-http://car.bitauto.com/pajieluosupao-2995/2003/
-http://car.bitauto.com/yikelisi/2008/#car_list
-http://car.bitauto.com/yikelisi/1997/
-http://car.bitauto.com/lanseex/2008/#car_list
-http://car.bitauto.com/sanlinggelandi/2010/#car_list
-http://car.bitauto.com/sanlinggelandi/2007/
-http://car.bitauto.com/sanlinggelandi/2004/
-http://car.bitauto.com/sanlinglanse/1996/
-http://car.bitauto.com/sibalusenlinren/2012/#car_list
-http://car.bitauto.com/sibalusenlinren/2011/
-http://car.bitauto.com/sibalusenlinren/2010/
-http://car.bitauto.com/sibalusenlinren/2009/
-http://car.bitauto.com/sibalusenlinren/2008/
-http://car.bitauto.com/sibalusenlinren/2007/
-http://car.bitauto.com/sibalusenlinren/2006/
-http://car.bitauto.com/sibalusenlinren/2004/
-http://car.bitauto.com/sibaluxv/2012/#car_list
-http://car.bitauto.com/sibaluaohu/2013/#car_list
-http://car.bitauto.com/sibaluaohu/2012/#car_list
-http://car.bitauto.com/sibaluaohu/2011/
-http://car.bitauto.com/sibaluaohu/2010/
-http://car.bitauto.com/sibaluaohu/2008/
-http://car.bitauto.com/yibao/2010/#car_list
-http://car.bitauto.com/yibao/2008/#car_list
-http://car.bitauto.com/yibao/2007/
-http://car.bitauto.com/yibao/2006/
-http://car.bitauto.com/yibao/2004/
-http://car.bitauto.com/xinlishi/2013/#car_list
-http://car.bitauto.com/xinlishi/2011/#car_list
-http://car.bitauto.com/xinlishi/2010/
-http://car.bitauto.com/xinlishi/2008/
-http://car.bitauto.com/xinlishi/2007/
-http://car.bitauto.com/xinlishi/2006/
-http://car.bitauto.com/xinlishi/2004/
-http://car.bitauto.com/yibaowrxsti/2012/#car_list
-http://car.bitauto.com/yibaowrxsti/2011/#car_list
-http://car.bitauto.com/yibaowrxsti/2009/
-http://car.bitauto.com/yibaowrxsti/2008/
-http://car.bitauto.com/sibaluchipeng/2011/#car_list
-http://car.bitauto.com/sibaluchipeng/2008/
-http://car.bitauto.com/fortwo/2012/#car_list
-http://car.bitauto.com/fortwo/2011/#car_list
-http://car.bitauto.com/fortwo/2010/
-http://car.bitauto.com/fortwo/2009/
-http://car.bitauto.com/jinglingjiezou/1998/
-http://car.bitauto.com/jinglingchunjie/2004/
-http://car.bitauto.com/aitengactyon/2011/#car_list
-http://car.bitauto.com/aitengactyon/2010/
-http://car.bitauto.com/aitengactyon/2009/
-http://car.bitauto.com/aitengactyon/2008/
-http://car.bitauto.com/aitengactyon/2006/
-http://car.bitauto.com/kelandekorando/2011/#car_list
-http://car.bitauto.com/kelandekorando/2005/
-http://car.bitauto.com/shuanglongxinzhuxi/2012/#car_list
-http://car.bitauto.com/shuanglongxinzhuxi/2005/
-http://car.bitauto.com/shuanglongxinzhuxi/2004/
-http://car.bitauto.com/shuanglongxinzhuxi/1998/
-http://car.bitauto.com/shuanglongxiangyukyron/2011/#car_list
-http://car.bitauto.com/shuanglongxiangyukyron/2010/
-http://car.bitauto.com/shuanglongxiangyukyron/2007/
-http://car.bitauto.com/shuanglongleisiteii/2011/#car_list
-http://car.bitauto.com/shuanglongleisiteii/2010/
-http://car.bitauto.com/shuanglongleisiteii/2008/
-http://car.bitauto.com/shuanglongleisiteii/2006/
-http://car.bitauto.com/shuanglongludirodius/2008/#car_list
-http://car.bitauto.com/shuanglongludirodius/2007/
-http://car.bitauto.com/shuanglongludirodius/2005/
-http://car.bitauto.com/shuanglongleisite/2007/
-http://car.bitauto.com/shuanglongleisite/2004/
-http://car.bitauto.com/shuanglongleisite/2002/
-http://car.bitauto.com/xiaoguizu/2009/#car_list
-http://car.bitauto.com/xiaoguizu/2008/
-http://car.bitauto.com/xiaoguizu/2007/
-http://car.bitauto.com/shuanghuansceo/2011/#car_list
-http://car.bitauto.com/shuanghuansceo/2010/
-http://car.bitauto.com/shuanghuansceo/2009/
-http://car.bitauto.com/shuanghuansceo/2007/
-http://car.bitauto.com/shuanghuansceo/2005/
-http://car.bitauto.com/shuanghuansceo/2004/
-http://car.bitauto.com/laibaosrv/2005/
-http://car.bitauto.com/laibaosrv/2004/
-http://car.bitauto.com/laibaosrv/2003/
-http://car.bitauto.com/laiwang/2003/
-http://car.bitauto.com/sabo95/2006/#car_list
-http://car.bitauto.com/sabo95/2003/
-http://car.bitauto.com/sabo95/2000/
-http://car.bitauto.com/sabo93/2007/#car_list
-http://car.bitauto.com/sabo93/2005/
-http://car.bitauto.com/shijuec8/2010/#car_list
-http://car.bitauto.com/shijuec8/2009/#car_list
-http://car.bitauto.com/tianmafengchi/2006/
-http://car.bitauto.com/tianmafengchi/2003/
-http://car.bitauto.com/tianmayingxiong/2009/#car_list
-http://car.bitauto.com/tianmayingxiong/2007/
-http://car.bitauto.com/tianmayingxiong/2003/
-http://car.bitauto.com/tianmafengrui/2005/
-http://car.bitauto.com/tianmajunchi/2005/
-http://car.bitauto.com/tianmahaishi/2004/
-http://car.bitauto.com/hongguang/2010/#car_list
-http://car.bitauto.com/wulingzhiguang/2010/#car_list
-http://car.bitauto.com/wulingzhiguang/2009/#car_list
-http://car.bitauto.com/wulingzhiguang/2008/
-http://car.bitauto.com/wulingzhiguang/2007/
-http://car.bitauto.com/wulingzhiguang/2006/
-http://car.bitauto.com/wulingzhiguang/2004/
-http://car.bitauto.com/wulingzhiguang/1999/
-http://car.bitauto.com/wulingrongguang/2012/#car_list
-http://car.bitauto.com/wulingrongguang/2011/#car_list
-http://car.bitauto.com/wulinghongtu/2007/#car_list
-http://car.bitauto.com/wulingxingwang/2009/#car_list
-http://car.bitauto.com/wulingxingwang/2006/
-http://car.bitauto.com/wulingxingwang/2005/
-http://car.bitauto.com/wulingxingwang/2003/
-http://car.bitauto.com/wulingrongguangxiaoka/2012/#car_list
-http://car.bitauto.com/pnxiliehuoche/2010/#car_list
-http://car.bitauto.com/pnxiliehuoche/2006/
-http://car.bitauto.com/wulingxiaoxuanfeng/2006/#car_list
-http://car.bitauto.com/wulingxiaoxuanfeng/2000/
-http://car.bitauto.com/wulingyangguang/2004/
-http://car.bitauto.com/changanwoerwos80l/2012/#car_list
-http://car.bitauto.com/changanwoerwos80l/2011/#car_list
-http://car.bitauto.com/changanwoerwos80l/2010/
-http://car.bitauto.com/changanwoerwos80l/2009/
-http://car.bitauto.com/changanwoerwos40/2012/#car_list
-http://car.bitauto.com/changanwoerwos40/2011/
-http://car.bitauto.com/changanwoerwos40/2010/
-http://car.bitauto.com/changanwoerwos40/2009/
-http://car.bitauto.com/changanwoerwos40/2007/
-http://car.bitauto.com/xc60/2012/#car_list
-http://car.bitauto.com/xc60/2011/#car_list
-http://car.bitauto.com/xc60/2010/
-http://car.bitauto.com/xc60/2009/
-http://car.bitauto.com/woerwos60/2012/#car_list
-http://car.bitauto.com/woerwos60/2011/#car_list
-http://car.bitauto.com/woerwos60/2003/
-http://car.bitauto.com/woerwos60/2000/
-http://car.bitauto.com/woerwoc30/2012/#car_list
-http://car.bitauto.com/woerwoc30/2010/#car_list
-http://car.bitauto.com/woerwoc30/2011/
-http://car.bitauto.com/woerwoc30/2008/
-http://car.bitauto.com/woerwoc30/2007/
-http://car.bitauto.com/woerwoc30/2006/
-http://car.bitauto.com/v60haiwai/2013/#car_list
-http://car.bitauto.com/v60haiwai/2012/#car_list
-http://car.bitauto.com/volvoxc90/2012/#car_list
-http://car.bitauto.com/volvoxc90/2004/#car_list
-http://car.bitauto.com/volvoxc90/2011/
-http://car.bitauto.com/volvoxc90/2010/
-http://car.bitauto.com/volvoxc90/2008/
-http://car.bitauto.com/volvoxc90/2003/
-http://car.bitauto.com/volvoc70/2010/#car_list
-http://car.bitauto.com/volvoc70/2008/
-http://car.bitauto.com/woerwov40/2012/#car_list
-http://car.bitauto.com/volvos80/2007/
-http://car.bitauto.com/volvos80/2006/
-http://car.bitauto.com/volvos80/2005/
-http://car.bitauto.com/volvos80/2004/
-http://car.bitauto.com/v70/2002/
-http://car.bitauto.com/s40/2006/
-http://car.bitauto.com/v5/2012/#car_list
-http://car.bitauto.com/v5/2009/#car_list
-http://car.bitauto.com/v5/2010/
-http://car.bitauto.com/weilinx5/2012/#car_list
-http://car.bitauto.com/weilinx5/2010/#car_list
-http://car.bitauto.com/h3/2011/#car_list
-http://car.bitauto.com/h5/2012/#car_list
-http://car.bitauto.com/h5/2010/#car_list
-http://car.bitauto.com/langdong/2012/#car_list
-http://car.bitauto.com/verna/2010/#car_list
-http://car.bitauto.com/suonata/2011/#car_list
-http://car.bitauto.com/xintusheng-2874/2012/#car_list
-http://car.bitauto.com/xintusheng-2874/2010/#car_list
-http://car.bitauto.com/yuedong/2011/#car_list
-http://car.bitauto.com/yuedong/2010/#car_list
-http://car.bitauto.com/yuedong/2008/
-http://car.bitauto.com/yilantesanxiang/2011/#car_list
-http://car.bitauto.com/yilantesanxiang/2008/
-http://car.bitauto.com/yilantesanxiang/2007/
-http://car.bitauto.com/yilantesanxiang/2006/
-http://car.bitauto.com/yilantesanxiang/2004/
-http://car.bitauto.com/yilantesanxiang/2003/
-http://car.bitauto.com/tusheng/2009/#car_list
-http://car.bitauto.com/tusheng/2008/
-http://car.bitauto.com/tusheng/2005/
-http://car.bitauto.com/yashente/2011/#car_list
-http://car.bitauto.com/yashente/2009/#car_list
-http://car.bitauto.com/yashente/2008/
-http://car.bitauto.com/yashente/2007/
-http://car.bitauto.com/yashente/2006/
-http://car.bitauto.com/ruinaliangxiang/2011/#car_list
-http://car.bitauto.com/i30/2009/#car_list
-http://car.bitauto.com/mingyu/2009/#car_list
-http://car.bitauto.com/sonatalingxiang/2009/
-http://car.bitauto.com/sonatayuxiang/2006/
-http://car.bitauto.com/sonatayuxiang/2005/
-http://car.bitauto.com/yilanteliangxiang/2007/
-http://car.bitauto.com/xiandaixinshengda/2012/#car_list
-http://car.bitauto.com/xiandaixinshengda/2011/
-http://car.bitauto.com/xiandaixinshengda/2010/
-http://car.bitauto.com/xiandaixinshengda/2009/
-http://car.bitauto.com/xiandaixinshengda/2007/
-http://car.bitauto.com/xiandaixinshengda/2006/
-http://car.bitauto.com/xiandaixinshengda/2005/
-http://car.bitauto.com/xiandaixinshengda/2000/
-http://car.bitauto.com/xiandaiveloster/2012/#car_list
-http://car.bitauto.com/xiandaiveloster/2011/#car_list
-http://car.bitauto.com/laoensicoupe/2012/#car_list
-http://car.bitauto.com/laoensicoupe/2009/#car_list
-http://car.bitauto.com/xinyakeshi/2012/#car_list
-http://car.bitauto.com/xinyakeshi/2009/#car_list
-http://car.bitauto.com/xinyakeshi/2011/
-http://car.bitauto.com/xinyakeshi/2006/
-http://car.bitauto.com/xiandaiyazun/2011/#car_list
-http://car.bitauto.com/xiandaiyazun/2010/
-http://car.bitauto.com/xiandaiyazun/2009/
-http://car.bitauto.com/xiandaiyazun/2006/
-http://car.bitauto.com/xiandaiweilakesi/2012/#car_list
-http://car.bitauto.com/xiandaiweilakesi/2010/
-http://car.bitauto.com/xiandaiweilakesi/2007/
-http://car.bitauto.com/xiandaiweilakesi/2006/
-http://car.bitauto.com/xiandailaoensi/2012/#car_list
-http://car.bitauto.com/xiandailaoensi/2008/
-http://car.bitauto.com/xiandaih1/2011/#car_list
-http://car.bitauto.com/xiandaisuonata/2012/#car_list
-http://car.bitauto.com/xiandaisuonata/2005/
-http://car.bitauto.com/xiandaisuonata/1993/
-http://car.bitauto.com/xiandaixinkupai/2008/
-http://car.bitauto.com/xiandaixinkupai/2006/
-http://car.bitauto.com/xiandaixinkupai/2004/
-http://car.bitauto.com/xiandaimeijia/2005/
-http://car.bitauto.com/keluzi/2012/#car_list
-http://car.bitauto.com/keluzi/2011/#car_list
-http://car.bitauto.com/keluzi/2010/
-http://car.bitauto.com/keluzi/2009/
-http://car.bitauto.com/xinsaiou/2011/#car_list
-http://car.bitauto.com/xinsaiou/2010/#car_list
-http://car.bitauto.com/xinsaiou/2005/
-http://car.bitauto.com/mairuibao/2012/#car_list
-http://car.bitauto.com/aiweiousanxiang/2011/#car_list
-http://car.bitauto.com/xinsaiousanxiang/2011/#car_list
-http://car.bitauto.com/xinsaiousanxiang/2010/#car_list
-http://car.bitauto.com/jingcheng/2012/#car_list
-http://car.bitauto.com/jingcheng/2011/#car_list
-http://car.bitauto.com/jingcheng/2010/
-http://car.bitauto.com/jingcheng/2008/
-http://car.bitauto.com/jingcheng/2007/
-http://car.bitauto.com/jingcheng/2006/
-http://car.bitauto.com/jingcheng/2005/
-http://car.bitauto.com/lefeng/2010/#car_list
-http://car.bitauto.com/lefeng/2009/
-http://car.bitauto.com/lefeng/2008/
-http://car.bitauto.com/lefeng/2007/
-http://car.bitauto.com/lefeng/2006/
-http://car.bitauto.com/kepaqi/2011/#car_list
-http://car.bitauto.com/aveors/2011/#car_list
-http://car.bitauto.com/xinlecheng/2010/#car_list
-http://car.bitauto.com/xinlecheng/2009/
-http://car.bitauto.com/xinlecheng/2008/
-http://car.bitauto.com/xinlecheng/2007/
-http://car.bitauto.com/xinlecheng/2006/
-http://car.bitauto.com/xinlecheng/2005/
-http://car.bitauto.com/xinsaiousrv/2005/
-http://car.bitauto.com/camaro/2012/#car_list
-http://car.bitauto.com/camaro/2011/#car_list
-http://car.bitauto.com/xuefolankepaqi/2011/#car_list
-http://car.bitauto.com/xuefolankepaqi/2010/
-http://car.bitauto.com/xuefolankepaqi/2008/
-http://car.bitauto.com/xuefolankepaqi/2007/
-http://car.bitauto.com/spark/2011/#car_list
-http://car.bitauto.com/keerweitec6/2009/#car_list
-http://car.bitauto.com/xuefolanvolthaiwai/2011/#car_list
-http://car.bitauto.com/shijiasanxiang/2012/#car_list
-http://car.bitauto.com/shijiasanxiang/2011/
-http://car.bitauto.com/shijiasanxiang/2010/
-http://car.bitauto.com/shijiasanxiang/2009/
-http://car.bitauto.com/dongfengxuetielongc5/2012/#car_list
-http://car.bitauto.com/dongfengxuetielongc5/2011/#car_list
-http://car.bitauto.com/dongfengxuetielongc5/2010/
-http://car.bitauto.com/xinailishe/2012/#car_list
-http://car.bitauto.com/xinailishe/2011/
-http://car.bitauto.com/xinailishe/2010/
-http://car.bitauto.com/xinailishe/2008/
-http://car.bitauto.com/xinailishe/2007/
-http://car.bitauto.com/xinailishe/2005/
-http://car.bitauto.com/xinailishe/2004/
-http://car.bitauto.com/xinailishe/2003/
-http://car.bitauto.com/xinailishe/2002/
-http://car.bitauto.com/shijialiangxiang/2012/#car_list
-http://car.bitauto.com/shijialiangxiang/2011/#car_list
-http://car.bitauto.com/shijialiangxiang/2010/
-http://car.bitauto.com/shijialiangxiang/2009/
-http://car.bitauto.com/shijialiangxiang/2008/
-http://car.bitauto.com/xuetielongc2/2012/#car_list
-http://car.bitauto.com/xuetielongc2/2010/#car_list
-http://car.bitauto.com/xuetielongc2/2008/
-http://car.bitauto.com/xuetielongc2/2006/
-http://car.bitauto.com/kaixuan/2010/#car_list
-http://car.bitauto.com/kaixuan/2008/
-http://car.bitauto.com/kaixuan/2006/
-http://car.bitauto.com/xinailisheliangxiang/2011/#car_list
-http://car.bitauto.com/xinailisheliangxiang/2009/#car_list
-http://car.bitauto.com/salabijiasuo/2007/#car_list
-http://car.bitauto.com/salabijiasuo/2004/
-http://car.bitauto.com/salabijiasuo/2001/
-http://car.bitauto.com/fukang/2008/
-http://car.bitauto.com/fukang/2005/
-http://car.bitauto.com/fukang/2004/
-http://car.bitauto.com/fukang/2003/
-http://car.bitauto.com/fukang/2002/
-http://car.bitauto.com/fukang/2001/
-http://car.bitauto.com/fukang/2000/
-http://car.bitauto.com/fukang/1999/
-http://car.bitauto.com/fukang/1998/
-http://car.bitauto.com/fukang/1997/
-http://car.bitauto.com/fukang/1995/
-http://car.bitauto.com/fukang/1993/
-http://car.bitauto.com/saina/2003/
-http://car.bitauto.com/c4aircross/2012/#car_list
-http://car.bitauto.com/xuetielongc4/2009/#car_list
-http://car.bitauto.com/xuetielongc4/2006/
-http://car.bitauto.com/xuetielongc6/2008/#car_list
-http://car.bitauto.com/xuetielongc6/2007/
-http://car.bitauto.com/c4bijiasuo/2009/#car_list
-http://car.bitauto.com/xuetielongc5/2007/
-http://car.bitauto.com/xuetielongc5/2005/
-http://car.bitauto.com/leon/2012/#car_list
-http://car.bitauto.com/ibiza/2012/#car_list
-http://car.bitauto.com/fengtianhongshan/2010/#car_list
-http://car.bitauto.com/linkenmkt-3614/2010/#car_list
-http://car.bitauto.com/futefxilie/2012/#car_list
-http://car.bitauto.com/futefxilie/2011/#car_list
-http://car.bitauto.com/benchisji-3616/2010/#car_list
-http://car.bitauto.com/fengtian4runner/2010/#car_list
-http://car.bitauto.com/gmchuangjiaji/2010/#car_list
-http://car.bitauto.com/futeshangwuche/2011/#car_list
-http://car.bitauto.com/linkenlinghangyuan-3618/2010/#car_list
-http://car.bitauto.com/sibintesprinter/2010/#car_list
-http://car.bitauto.com/linkenmkx-3612/2011/#car_list
-http://car.bitauto.com/linkenmkx-3612/2010/#car_list
-http://car.bitauto.com/ruida/2011/#car_list
-http://car.bitauto.com/xinkaipika/2003/
-http://car.bitauto.com/xinkaisuv/2003/
-http://car.bitauto.com/xinkaisrv/2003/
-http://car.bitauto.com/xinkaihaishi/2003/
-http://car.bitauto.com/xialin5/2011/#car_list
-http://car.bitauto.com/xialin5/2010/
-http://car.bitauto.com/weizhiv5/2012/#car_list
-http://car.bitauto.com/xialia/2011/#car_list
-http://car.bitauto.com/xialia/2007/
-http://car.bitauto.com/xialia/2006/
-http://car.bitauto.com/xialia/2005/
-http://car.bitauto.com/xialin3/2012/#car_list
-http://car.bitauto.com/xialin3/2008/#car_list
-http://car.bitauto.com/xialin3/2007/
-http://car.bitauto.com/weiziv1/2012/#car_list
-http://car.bitauto.com/weiziv1/2010/#car_list
-http://car.bitauto.com/weizhisanxiang/2011/#car_list
-http://car.bitauto.com/weizhisanxiang/2009/#car_list
-http://car.bitauto.com/weizhisanxiang/2007/
-http://car.bitauto.com/weizhisanxiang/2006/
-http://car.bitauto.com/xialin3liangxiang/2012/#car_list
-http://car.bitauto.com/xialin3liangxiang/2008/
-http://car.bitauto.com/xialin3liangxiang/2007/
-http://car.bitauto.com/weile/2008/#car_list
-http://car.bitauto.com/weile/2007/
-http://car.bitauto.com/weile/2006/
-http://car.bitauto.com/weile/2005/
-http://car.bitauto.com/weile/2004/
-http://car.bitauto.com/weizi/2004/#car_list
-http://car.bitauto.com/weizi/2006/
-http://car.bitauto.com/weizi/2002/
-http://car.bitauto.com/xialin3-1885/2007/
-http://car.bitauto.com/xialin3-1885/2006/
-http://car.bitauto.com/xialin3-1885/2005/
-http://car.bitauto.com/xialin3-1885/2004/
-http://car.bitauto.com/xialin3-1885/2002/
-http://car.bitauto.com/xialin3-1885/2000/
-http://car.bitauto.com/weizhiliangxiang/2009/
-http://car.bitauto.com/weizhiliangxiang/2006/
-http://car.bitauto.com/xiali2000/2002/
-http://car.bitauto.com/xiali2000/2000/
-http://car.bitauto.com/xiali/2005/
-http://car.bitauto.com/xiali/2004/
-http://car.bitauto.com/xiali/2003/
-http://car.bitauto.com/xiali/2002/
-http://car.bitauto.com/xiali/2001/
-http://car.bitauto.com/xiali/1993/
-http://car.bitauto.com/xiali/1990/
-http://car.bitauto.com/hualiweixingkeche/1993/
-http://car.bitauto.com/senyam80/2012/#car_list
-http://car.bitauto.com/senyam80/2011/
-http://car.bitauto.com/senyam80/2009/
-http://car.bitauto.com/senyas80/2012/#car_list
-http://car.bitauto.com/senyas80/2011/
-http://car.bitauto.com/yiqijiabao/2012/#car_list
-http://car.bitauto.com/yiqijiabao/2011/#car_list
-http://car.bitauto.com/yiqijiabao/2010/
-http://car.bitauto.com/yiqijiabao/2009/
-http://car.bitauto.com/yiqijiabao/2000/
-http://car.bitauto.com/yiqiaoxing/2004/
-http://car.bitauto.com/ziyoufeng/2010/#car_list
-http://car.bitauto.com/ziyoufeng/2009/#car_list
-http://car.bitauto.com/ziyoufeng/2007/
-http://car.bitauto.com/ziyoufeng/2006/
-http://car.bitauto.com/kuncheng/2011/#car_list
-http://car.bitauto.com/yingfeinidifx/2013/#car_list
-http://car.bitauto.com/yingfeinidifx/2011/#car_list
-http://car.bitauto.com/yingfeinidifx/2010/
-http://car.bitauto.com/yingfeinidifx/2009/
-http://car.bitauto.com/yingfeinidifx/2007/
-http://car.bitauto.com/yingfeinidifx/2006/
-http://car.bitauto.com/yingfeinidig/2013/#car_list
-http://car.bitauto.com/yingfeinidig/2010/#car_list
-http://car.bitauto.com/yingfeinidig/2009/
-http://car.bitauto.com/yingfeinidig/2007/
-http://car.bitauto.com/yingfeinidiex/2013/#car_list
-http://car.bitauto.com/yingfeinidiex/2011/#car_list
-http://car.bitauto.com/yingfeinidiex/2010/
-http://car.bitauto.com/yingfeinidiex/2009/
-http://car.bitauto.com/yingfeinidim/2012/#car_list
-http://car.bitauto.com/yingfeinidim/2011/#car_list
-http://car.bitauto.com/yingfeinidim/2009/
-http://car.bitauto.com/yingfeinidim/2008/
-http://car.bitauto.com/yingfeinidiqx56/2013/#car_list
-http://car.bitauto.com/yingfeinidiqx56/2011/#car_list
-http://car.bitauto.com/yingfeinidiqx56/2008/
-http://car.bitauto.com/yingfeinidiqx56/2005/
-http://car.bitauto.com/yingfeinidijxhaiwai/2012/#car_list
-http://car.bitauto.com/yemaf12/2012/#car_list
-http://car.bitauto.com/yemaf99/2012/#car_list
-http://car.bitauto.com/yemaf99/2011/#car_list
-http://car.bitauto.com/yemaf99/2010/
-http://car.bitauto.com/yemaf99/2009/
-http://car.bitauto.com/yemaf10/2012/#car_list
-http://car.bitauto.com/yemaf10/2011/#car_list
-http://car.bitauto.com/a380/2012/#car_list
-http://car.bitauto.com/a380/2010/#car_list
-http://car.bitauto.com/a380/2009/
-http://car.bitauto.com/fengjingxian/2007/
-http://car.bitauto.com/zhuangwei/2007/
-http://car.bitauto.com/zhuangwei/2006/
-http://car.bitauto.com/yongyuanwuxing/2012/#car_list
-http://car.bitauto.com/baodi/2011/#car_list
-http://car.bitauto.com/dulingv/2011/#car_list
-http://car.bitauto.com/dulingv/2008/#car_list
-http://car.bitauto.com/dulingv/2004/
-http://car.bitauto.com/deyi/2011/#car_list
-http://car.bitauto.com/yueyeche/2011/#car_list
-http://car.bitauto.com/weinisi/2011/#car_list
-http://car.bitauto.com/daily/2006/
-http://car.bitauto.com/daily/2004/
-http://car.bitauto.com/daily/2003/
-http://car.bitauto.com/kangguo/2004/
-http://car.bitauto.com/kangguo/2003/
-http://car.bitauto.com/keyunkeche/2005/
-http://car.bitauto.com/youyizhongba/2008/#car_list
-http://car.bitauto.com/zhonghuav5/2012/#car_list
-http://car.bitauto.com/zhonghuav5/2011/#car_list
-http://car.bitauto.com/zhonghuah330/2012/#car_list
-http://car.bitauto.com/huachena4/2012/#car_list
-http://car.bitauto.com/huachena4/2011/#car_list
-http://car.bitauto.com/junjiefrv/2010/#car_list
-http://car.bitauto.com/junjiefrv/2009/
-http://car.bitauto.com/junjiefrv/2008/
-http://car.bitauto.com/zhonghuah320/2012/#car_list
-http://car.bitauto.com/junjie/2012/#car_list
-http://car.bitauto.com/junjie/2011/#car_list
-http://car.bitauto.com/junjie/2010/
-http://car.bitauto.com/junjie/2008/
-http://car.bitauto.com/junjie/2007/
-http://car.bitauto.com/junjie/2006/
-http://car.bitauto.com/junjiefsv/2011/#car_list
-http://car.bitauto.com/junjiefsv/2010/#car_list
-http://car.bitauto.com/junjiefsv/2009/
-http://car.bitauto.com/junjiecross/2010/#car_list
-http://car.bitauto.com/junjiecross/2009/
-http://car.bitauto.com/zhonghuakubao/2008/#car_list
-http://car.bitauto.com/zhonghuakubao/2007/#car_list
-http://car.bitauto.com/zunchi/2011/#car_list
-http://car.bitauto.com/zunchi/2010/
-http://car.bitauto.com/zunchi/2009/
-http://car.bitauto.com/zunchi/2008/
-http://car.bitauto.com/zunchi/2007/
-http://car.bitauto.com/zunchi/2005/
-http://car.bitauto.com/zunchi/2004/
-http://car.bitauto.com/junjiewagon/2011/#car_list
-http://car.bitauto.com/junjiewagon/2009/
-http://car.bitauto.com/zhonghua/2004/
-http://car.bitauto.com/zhonghua/2003/
-http://car.bitauto.com/zhongtai5008/2011/#car_list
-http://car.bitauto.com/zhongtai5008/2010/#car_list
-http://car.bitauto.com/zhongtai5008/2008/
-http://car.bitauto.com/zhongtaiz300/2012/#car_list
-http://car.bitauto.com/jiangnanaotuo/2010/#car_list
-http://car.bitauto.com/jiangnanaotuo/2008/
-http://car.bitauto.com/jiangnanaotuo/2007/
-http://car.bitauto.com/jiangnanaotuo/2004/
-http://car.bitauto.com/zhongtai2008/2011/#car_list
-http://car.bitauto.com/zhongtai2008/2010/#car_list
-http://car.bitauto.com/zhongtai2008/2007/
-http://car.bitauto.com/langjun/2011/#car_list
-http://car.bitauto.com/langjie-3185/2011/#car_list
-http://car.bitauto.com/mengdibolang/2010/#car_list
-http://car.bitauto.com/mengdibolang/2009/
-http://car.bitauto.com/zhongtaiv10/2012/#car_list
-http://car.bitauto.com/zhongtaiv10/2011/
-http://car.bitauto.com/zhongxingweihu/2011/#car_list
-http://car.bitauto.com/zhongxingweihu/2010/#car_list
-http://car.bitauto.com/zhongxingweihu/2006/
-http://car.bitauto.com/zhongxingqijian/2009/#car_list
-http://car.bitauto.com/zhongxingqijian/2006/
-http://car.bitauto.com/zhongxingqijian/2004/
-http://car.bitauto.com/zhongxingwuxian/2012/#car_list
-http://car.bitauto.com/zhongxingwuxian/2010/
-http://car.bitauto.com/zhongxingwuxian/2009/
-http://car.bitauto.com/zhongxingwuxian/2008/
-http://car.bitauto.com/zhongxingwuxian/2006/
-http://car.bitauto.com/zhongxingwuxian/2005/
-http://car.bitauto.com/changlingpika/2010/#car_list
-http://car.bitauto.com/changlingpika/2003/
-http://car.bitauto.com/zhongxingfuxingsuv/2004/
-http://car.bitauto.com/chiyexinjingying/2003/
-http://car.bitauto.com/chiyexinjingying/2002/
-http://car.bitauto.com/zhongxinghaibao/2000/
-http://car.bitauto.com/zhongxinglaohu/2005/
-http://car.bitauto.com/zhongxinglaohu/2002/
-http://car.bitauto.com/zhongoufangche/2011/#car_list
-http://car.bitauto.com/zhongshunshiji/2006/
-http://car.bitauto.com/zhongshunshiji/2004/	
-)
-				create_file_to_write id             
-                output_content
-            end #initialize
-
-            def self.go(id)
-                self.new(id)
-            end
-
-            def create_file_to_write id
-                file_path = File.join('.', id.to_s.concat('.txt'))
-                @file_to_write = IoFactory.init(file_path)
-            end #create_file_to_write
-
-            def init_logger
-                logger_file = IoFactory.init('./log.txt')
-                logger = Logger.new logger_file
-                ContentWorker.log = logger
-            end #init_logger
-
-            def get_start_url               
-                @start_url = @url_builder.article_url
-            end #get_start_url
-
-            def get_total_page
-                @total_page = ContentWorker.new(@start_url).total_page
-				@total_page = 1 if @total_page == 0
-				puts @total_page.to_s + "pages"
-                if @total_page.nil?
-                    puts 'Can not get total page'
-                    exit
-                end #if
-
-            end # get_total_page
-
-            def output_content 
-				total = @url_lists.length
-				@url_lists.each_with_index do |url, i|
-					puts "#{i}/#{total} -- #{url}"
-                    ContentWorker.new(url).build_lists do |c|
-						c.each do |e|
-							@file_to_write.puts "#{e}"
-						end
-                    end # build_lists
-                end #times
-            end #output_content
-
-    end #Runner
-
-end #SanLv
-
-include SanLv
-
-id = 1111
-
-Runner.go id
- 
