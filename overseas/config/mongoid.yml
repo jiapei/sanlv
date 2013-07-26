@@ -1,0 +1,29 @@
+development:
+  sessions:
+    default:
+      identity_map_enabled: true
+      database: mycar_development
+      hosts:
+        - test.lehazi.com:27017
+aap:
+  sessions:
+    default:
+      identity_map_enabled: true
+      database: aap
+      hosts:
+        - 127.0.0.1:27017		
+localcar:
+  sessions:
+    default:
+      identity_map_enabled: true
+      database: qqcar
+      hosts:
+        - 127.0.0.1:27017
+chezhongguo:
+  sessions:
+    default:
+      identity_map_enabled: true	
+      database: chezhongguo
+      hosts:
+        - www.baigoosoft.com:27017
+

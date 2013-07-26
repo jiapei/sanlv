@@ -1,0 +1,43 @@
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/category_brake-drums-rotors_16462#storeId=10151&langId=-1&catalogId=10051&vehicleIdSearch=-1&isAllVehicle=true&navigationPath=L1*14921%7CL2*16462&sortBy=5&categoryId=16462&fromCategory=yes&pageId=ajaxPartList&category=&keywords=brake-drums-rotors&l1_categoryId=16462&l2_categoryId=&partType=&beginIndex=10&pageSize=10&priceZoneZip_15670209=enter+zip+code&filters=&selectedPartNumber=&qty=1&ship2HomeClicked=
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/category_brake-drums-rotors_16462#storeId=10151&langId=-1&catalogId=10051&vehicleIdSearch=-1&isAllVehicle=true&navigationPath=L1*14921%7CL2*16462&sortBy=5&categoryId=16462&fromCategory=yes&pageId=ajaxPartList&category=&keywords=brake-drums-rotors&l1_categoryId=16462&l2_categoryId=&partType=&beginIndex=20&pageSize=10&priceZoneZip_15670362=enter+zip+code&filters=&selectedPartNumber=&qty=1&ship2HomeClicked=
+
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/PartListCmd?storeId=10151&langId=-1&catalogId=10051&vehicleIdSearch=-1&isAllVehicle=true&navigationPath=L1*14921|L2*16462&sortBy=5&categoryId=16462&fromCategory=yes&pageId=ajaxPartList&category=&keywords=brake-drums-rotors&l1_categoryId=16462&l2_categoryId=&partType=&beginIndex=140&pageSize=10&isSkuShippable_15670368=1&priceZoneZip_15670368=enter+zip+code&isSkuShippable_15670405=1&priceZoneZip_15670405=enter+zip+code&isSkuShippable_20671540=1&priceZoneZip_20671540=enter+zip+code&isSkuShippable_15670253=1&priceZoneZip_15670253=enter+zip+code&isSkuShippable_15670208=1&priceZoneZip_15670208=enter+zip+code&isSkuShippable_15670365=1&priceZoneZip_15670365=enter+zip+code&isSkuShippable_15670339=1&priceZoneZip_15670339=enter+zip+code&isSkuShippable_5670080=1&priceZoneZip_5670080=enter+zip+code&isSkuShippable_5670057=1&priceZoneZip_5670057=enter+zip+code&isSkuShippable_3563677=1&priceZoneZip_3563677=enter+zip+code&filters=&selectedPartNumber=&qty=1&ship2HomeClcked=
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/PartListCmd?storeId=10151&langId=-1&catalogId=10051&vehicleIdSearch=-1&isAllVehicle=true&navigationPath=L1*14921|L2*16462&sortBy=5&categoryId=16462&fromCategory=yes&pageId=ajaxPartList&category=&keywords=brake-drums-rotors&l1_categoryId=16462&l2_categoryId=&partType=&beginIndex=50&pageSize=10&isSkuShippable_15670399=1&priceZoneZip_15670399=enter+zip+code&isSkuShippable_5670075=1&priceZoneZip_5670075=enter+zip+code&isSkuShippable_15670175=1&priceZoneZip_15670175=enter+zip+code&isSkuShippable_15670288=1&priceZoneZip_15670288=enter+zip+code&isSkuShippable_15670422=1&priceZoneZip_15670422=enter+zip+code&isSkuShippable_3563588=1&priceZoneZip_3563588=enter+zip+code&isSkuShippable_5670070=1&priceZoneZip_5670070=enter+zip+code&isSkuShippable_3567524=1&priceZoneZip_3567524=enter+zip+code&isSkuShippable_20671576=1&priceZoneZip_20671576=enter+zip+code&isSkuShippable_15670099=1&priceZoneZip_15670099=enter+zip+code&filters=&selectedPartNumber=&qty=1&ship2HomeClicked=
+
+====details
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/product_brake-rotor--front-wearever_5670068-p?navigationPath=L1*14921|L2*16462
+YH145308
+YH145250
+
+===the true list
+
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/PartListCmd?storeId=10151&langId=-1&catalogId=10051&vehicleIdSearch=-1&isAllVehicle=true&navigationPath=L1*14921|L2*16462&sortBy=5&categoryId=16462&fromCategory=yes&pageId=ajaxPartList&category=&keywords=brake-drums-rotors&l1_categoryId=16462&l2_categoryId=&partType=&beginIndex=140&pageSize=100
+
+最多每页 50条记录
+
+====get maker from year
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/FetchVehicleDetailsView?YMMEAction=wantMake&vehicleType=3&year=2013&storeId=10151&catalogId=10051&langId=-1
+
+====get model from maker and  year
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/FetchVehicleDetailsView?YMMEAction=wantModel&vehicleType=3&year=2000&make=Audi&storeId=10151&catalogId=10051&langId=-1
+
+====get engine from year and maker and model
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/FetchVehicleDetailsView?YMMEAction=wantEngine&vehicleType=3&year=2000&make=Audi&model=A6+Quattro&storeId=10151&catalogId=10051&langId=-1
+
+====
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/FetchVehicleDetailsView?YMMEAction=wantEngine&vehicleType=3&year=2000&make=Audi&model=A6+Quattro&storeId=10151&catalogId=10051&langId=-1
+
+====
+http://shop.advanceautoparts.com/webapp/wcs/stores/servlet/AjaxManageMyGarageCmd?storeId=10151&catalogId=10051&langId=-1&vehicleID=145170&vehicleCODE=1375770&productId=-49841723&callingPage=CheckFitModal&saveVehicleFromCheckFit=false&actionCode=addVehicle&vehicleMake=Audi&vehicleModel=A6+Quattro&vehicleEngine=2.8L+2771CC+V6+FI+VIN&vehicleYear=2000
+
+
+一、数据来源：
+Advance Auto Part #
+Bendix #
+NAPA rotor #
+Auto Zone #
+
+二、主要收集数据：
+1.产品描述
+2.产品适用车型
+3.（车型数据）
