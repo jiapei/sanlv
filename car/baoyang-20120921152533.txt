@@ -1,5 +1,0 @@
-0	http://car.bitauto.com/saab/	
-1	http://car.bitauto.com/seat/	
-2	http://car.bitauto.com/xdd/	
-3	http://car.bitauto.com/polarsunautomobile/	
-4	http://car.bitauto.com/sgautomotive/	

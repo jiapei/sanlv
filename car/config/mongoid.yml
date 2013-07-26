@@ -20,3 +20,11 @@ chezhongguo:
       hosts:
         - www.baigoosoft.com:27017
 
+chezhongguo_development:
+  sessions:
+    default:
+      identity_map_enabled: true	
+      database: chezhongguo_development
+      hosts:
+        - test.lehazi.com:27017
+

@@ -1,3 +1,0 @@
-0	http://car.bitauto.com/saab/	<dt>
-<img src="http://img1.bitauto.com/bt/car/default/images/carimage/m_103_100.jpg"><p>萨博</p>
-</dt>
